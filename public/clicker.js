@@ -414,42 +414,62 @@ function createGraph(options) {
 
 function drawChart(scores) {
   console.log(scores);
-
-  // Prepare data for the chart
-  var data = new google.visualization.DataTable();
-  data.addColumn("number", "Seconds");
-
-  // Add columns for each user
-  for (const judge in scores) {
-    data.addColumn("number", judge);
+  const scoreMap = {};
+  for (const key in scores) {
+    const judgeArray = scores[key];
+    judgeArray.forEach(({ second, score }) => {
+      if (!scoreMap[second]) {
+        scoreMap[second] = Array(Object.keys(scores).length).fill(null);
+      }
+      scoreMap[second][Object.keys(scores).indexOf(key)] = score;
+    });
   }
+  var resultArray = Object.entries(scoreMap).map(([second, scores]) => {
+    const row = [parseInt(second, 10)];
+    scores.forEach((score) => row.push(score));
+    return row;
+  });
+  resultArray.sort((a, b) => a[0] - b[0]);
 
-  // Find the maximum number of rows needed
-  const maxRows = Math.max(...Object.values(scores).map((arr) => arr.length));
-
-  // Add data rows
-  for (let i = 0; i < maxRows; i++) {
-    for (const user in scores) {
-      const userData = scores[user];
-      row = [userData[i].second];
-      const scoreValue = i < userData.length ? userData[i].score : null;
-      row.push(scoreValue);
-      console.log(row);
+  for (var i = 0; i < resultArray.length; i++) {
+    if (i == 0) {
+      for (var j = 1; j < resultArray[i].length; j++) {
+        if (resultArray[i][j] == null) {
+          resultArray[i][j] = 0;
+        }
+      }
+    } else {
+      for (var j = 1; j < resultArray[i].length; j++) {
+        if (resultArray[i][j] == null) {
+          resultArray[i][j] = resultArray[i - 1][j];
+        }
+      }
     }
-    data.addRow(row);
   }
 
-  // Set chart options
+  const keys = Object.keys(scores);
+  const firstLine = ["Seconds", ...keys];
+  resultArray.unshift(firstLine);
+
+  console.log(resultArray);
+
+  var data = google.visualization.arrayToDataTable(resultArray);
+
   var options = {
     title: "Scores Over Time",
     titleTextStyle: {
       color: "#5bebaf",
     },
     backgroundColor: "#414141",
-    colors: ["#5bebaf", "#285e48", "#728a80", "#2a453a", "#b6d1c6"],
+    colors: ["#5bebaf", "#23f7e2", "#adefff"],
     curveType: "function",
     fontName: "Courier",
-    legend: { position: "top"},
+    legend: {
+      position: "top",
+      textStyle: {
+        color: "#5bebaf",
+      },
+    },
     hAxis: {
       title: "Time",
       titleTextStyle: {
@@ -470,12 +490,34 @@ function drawChart(scores) {
       },
       gridlines: { count: 5 },
     },
+    tooltip: {
+      isHtml: true,
+      textStyle: { 
+        fontSize: 20
+      },
+      trigger: 'both',
+      formatter: function (dataTable, row) {
+        var seconds = dataTable.getValue(row, 0);
+        return '<div style="padding:10px;">' +
+          '<strong>Seconds: ' + seconds + '</strong><br>' +
+          '</div>';
+      }
+    }
   };
 
   var chart = new google.visualization.LineChart(
     document.getElementById("chart")
   );
   chart.draw(data, options);
+
+  google.visualization.events.addListener(chart, 'select', function() {
+    var selectedItem = chart.getSelection()[0];
+    if (selectedItem) {
+      var seconds = data.getValue(selectedItem.row, 0);
+      console.log('Selected Seconds:', seconds);
+      chart.setSelection([{row: selectedItem.row, column: 1}]);
+    }
+  });
 }
 
 //function that looks up other judges' scores for a freestyle video
