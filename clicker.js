@@ -404,7 +404,7 @@ var viewSeconds = 0;
 
       //function that looks up other judges' scores for a freestyle video
       function getScores() {
-        openSave();
+        openFlash();
         isViewerMode = true;
         $("#judge-select").show();
         $("#scoring").show();
