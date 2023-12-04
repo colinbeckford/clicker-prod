@@ -148,7 +148,6 @@ $(document).ready(function () {
   $("#input-assign").hide();
   $("#judge-select").hide();
   $("#scoring").hide();
-  $("#post-data").hide();
   $("#positive-key").on("keydown", function (pos_e) {
     posKey = pos_e.keyCode;
   });
@@ -409,7 +408,75 @@ function createDropdown(options) {
   $("#judge-pick").show();
 }
 
-function createGraph(options) {}
+function createGraph(options) {
+  google.charts.setOnLoadCallback(drawChart(options));
+}
+
+function drawChart(scores) {
+  console.log(scores);
+
+  // Prepare data for the chart
+  var data = new google.visualization.DataTable();
+  data.addColumn("number", "Seconds");
+
+  // Add columns for each user
+  for (const judge in scores) {
+    data.addColumn("number", judge);
+  }
+
+  // Find the maximum number of rows needed
+  const maxRows = Math.max(...Object.values(scores).map((arr) => arr.length));
+
+  // Add data rows
+  for (let i = 0; i < maxRows; i++) {
+    for (const user in scores) {
+      const userData = scores[user];
+      row = [userData[i].second];
+      const scoreValue = i < userData.length ? userData[i].score : null;
+      row.push(scoreValue);
+      console.log(row);
+    }
+    data.addRow(row);
+  }
+
+  // Set chart options
+  var options = {
+    title: "Scores Over Time",
+    titleTextStyle: {
+      color: "#5bebaf",
+    },
+    backgroundColor: "#414141",
+    colors: ["#5bebaf", "#285e48", "#728a80", "#2a453a", "#b6d1c6"],
+    curveType: "function",
+    fontName: "Courier",
+    legend: { position: "top"},
+    hAxis: {
+      title: "Time",
+      titleTextStyle: {
+        color: "#5bebaf",
+      },
+      textStyle: {
+        color: "#5bebaf",
+      },
+      gridlines: { count: 5 },
+    },
+    vAxis: {
+      title: "Score",
+      titleTextStyle: {
+        color: "#5bebaf",
+      },
+      textStyle: {
+        color: "#5bebaf",
+      },
+      gridlines: { count: 5 },
+    },
+  };
+
+  var chart = new google.visualization.LineChart(
+    document.getElementById("chart")
+  );
+  chart.draw(data, options);
+}
 
 //function that looks up other judges' scores for a freestyle video
 function getScores() {
@@ -430,7 +497,9 @@ function getScores() {
 
         return acc;
       }, {});
+      console.log("splitbyjudge", splitByJudge);
       createDropdown(splitByJudge);
+      createGraph(splitByJudge);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -451,6 +520,8 @@ function formatList() {
   for (var i = 0; i < clickList.length; i++) {
     judgeEntry.push([judgeName, yt_link, clickList[i][0], clickList[i][1]]);
   }
+  console.log(judgeEntry);
+  console.log(JSON.stringify(judgeEntry));
   fetch("http://localhost:3000/appendClicks", {
     method: "POST",
     headers: {
@@ -460,6 +531,7 @@ function formatList() {
   })
     .then((response) => response.json())
     .then((data) => {
+      console.log("data", data);
       return data;
     })
     .catch((error) => {
