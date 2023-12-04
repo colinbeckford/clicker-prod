@@ -20,16 +20,6 @@ var isViewerMode = false;
 var viewIncrement = 0;
 var selectedJudgeIndex = 0;
 var selectedClicks = [];
-var aX = [];
-var aY = [];
-var bX = [];
-var bY = [];
-var cX = [];
-var cY = [];
-var dX = [];
-var dY = [];
-var eX = [];
-var eY = [];
 var judgePick;
 var posKey = 75;
 var negKey = 74;
@@ -37,44 +27,7 @@ var doubleKey = 50;
 var submitKey = 48;
 var submitBool = false;
 var done = false;
-
-// //google api functions
-// function initClient() {
-//   var API_KEY = "AIzaSyD-6YxG5mymcHxuw2_oa8FmUCzFas72sfk";
-//   var CLIENT_ID =
-//     "698696933761-acb051hpb6gj7t3aa03g95ed7ocln0le.apps.googleusercontent.com";
-//   var SCOPE = "https://www.googleapis.com/auth/spreadsheets";
-//   gapi.client
-//     .init({
-//       apiKey: API_KEY,
-//       clientId: CLIENT_ID,
-//       scope: SCOPE,
-//       discoveryDocs: [
-//         "https://sheets.googleapis.com/$discovery/rest?version=v4",
-//       ],
-//     })
-//     .then(function () {
-//       gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
-//       updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-//     });
-// }
-
-// function handleClientLoad() {
-//   gapi.load("client:auth2", initClient);
-// }
-
-// function updateSignInStatus(isSignedIn) {
-//   if (isSignedIn) {
-//     alert("You are signed in.");
-//   }
-// }
-// function handleSignInClick(event) {
-//   handleClientLoad();
-//   gapi.auth2.getAuthInstance().signIn();
-// }
-// function handleSignOutClick(event) {
-//   gapi.auth2.getAuthInstance().signOut();
-// }
+var splitByJudge = [];
 
 //loads freestyle video into the iframe
 function loadVideo() {
@@ -103,32 +56,8 @@ function onPlayerReady(event) {
   event.target.pauseVideo();
   if (isViewerMode) {
     selectedJudgeIndex = judgePick.selectedIndex;
-    if (selectedJudgeIndex == 0) {
-      selectedClicks = [];
-      for (var i = 0; i < bX.length; i++) {
-        selectedClicks.push([bX[i], bY[i]]);
-      }
-    } else if (selectedJudgeIndex == 1) {
-      selectedClicks = [];
-      for (var i = 0; i < bX.length; i++) {
-        selectedClicks.push([bX[i], bY[i]]);
-      }
-    } else if (selectedJudgeIndex == 2) {
-      selectedClicks = [];
-      for (var i = 0; i < cX.length; i++) {
-        selectedClicks.push([cX[i], cY[i]]);
-      }
-    } else if (selectedJudgeIndex == 3) {
-      selectedClicks = [];
-      for (var i = 0; i < dX.length; i++) {
-        selectedClicks.push([dX[i], dY[i]]);
-      }
-    } else if (selectedJudgeIndex == 4) {
-      selectedClicks = [];
-      for (var i = 0; i < eX.length; i++) {
-        selectedClicks.push([eX[i], eY[i]]);
-      }
-    }
+    const judgeSplitAsArray = Object.values(splitByJudge);
+    selectedClicks = judgeSplitAsArray[selectedJudgeIndex];
   }
 }
 
@@ -166,7 +95,6 @@ $(document).ready(function () {
   } else if (myurl.searchParams.has("name")) {
     $("#judge-name").val(myurl.searchParams.get("name"));
   }
-  // handleSignInClick();
 });
 
 //key click functions
@@ -257,9 +185,9 @@ function change() {
 
 function viewAdd(list) {
   viewSeconds = Math.floor(player.getCurrentTime());
-  while (viewSeconds == list[viewIncrement][0]) {
+  while (viewSeconds == list[viewIncrement].second) {
     if (viewIncrement == 0) {
-      if (list[viewIncrement][1] == 1) {
+      if (list[viewIncrement].score == 1) {
         positive = 1;
         negative = 0;
         $("#click-display").text(
@@ -269,7 +197,7 @@ function viewAdd(list) {
         if (isFlash) {
           changeColors("pos");
         }
-      } else if (list[viewIncrement][1] == 2) {
+      } else if (list[viewIncrement].score == 2) {
         positive = 2;
         negative = 0;
         $("#click-display").text(
@@ -279,7 +207,7 @@ function viewAdd(list) {
         if (isFlash) {
           changeColors("dub");
         }
-      } else if (list[viewIncrement][1] == -1) {
+      } else if (list[viewIncrement].score == -1) {
         positive = 0;
         negative = 1;
         $("#click-display").text(
@@ -291,7 +219,7 @@ function viewAdd(list) {
         }
       }
     } else {
-      if (list[viewIncrement][1] == list[viewIncrement - 1][1] + 1) {
+      if (list[viewIncrement].score == list[viewIncrement - 1].score + 1) {
         positive++;
         $("#click-display").text(
           "+" + String(positive) + " " + "-" + String(negative)
@@ -300,7 +228,7 @@ function viewAdd(list) {
         if (isFlash) {
           changeColors("pos");
         }
-      } else if (list[viewIncrement][1] == list[viewIncrement - 1][1] - 1) {
+      } else if (list[viewIncrement].score == list[viewIncrement - 1].score - 1) {
         negative++;
         $("#click-display").text(
           "+" + String(positive) + " " + "-" + String(negative)
@@ -309,7 +237,7 @@ function viewAdd(list) {
         if (isFlash) {
           changeColors("neg");
         }
-      } else if (list[viewIncrement][1] == list[viewIncrement - 1][1] + 2) {
+      } else if (list[viewIncrement].score == list[viewIncrement - 1].score + 2) {
         positive = positive + 2;
         $("#click-display").text(
           "+" + String(positive) + " " + "-" + String(negative)
@@ -379,10 +307,9 @@ function saveData() {
   $("#input-assign").show();
   $("#scoring").show();
   judgeName = $("#judge-name").val();
-  loadVideo();
   getLinks(yt_link)
     .then((result) => {
-      const splitByJudge = result.reduce((acc, obj) => {
+      splitByJudge = result.reduce((acc, obj) => {
         const { judge, second, score } = obj;
         const rest = { second, score };
 
@@ -395,6 +322,7 @@ function saveData() {
     .catch((error) => {
       console.error("Error:", error);
     });
+  loadVideo();
 }
 
 function createDropdown(options) {
@@ -413,7 +341,6 @@ function createGraph(options) {
 }
 
 function drawChart(scores) {
-  console.log(scores);
   const scoreMap = {};
   for (const key in scores) {
     const judgeArray = scores[key];
@@ -450,8 +377,6 @@ function drawChart(scores) {
   const keys = Object.keys(scores);
   const firstLine = ["Seconds", ...keys];
   resultArray.unshift(firstLine);
-
-  console.log(resultArray);
 
   var data = google.visualization.arrayToDataTable(resultArray);
 
@@ -490,34 +415,27 @@ function drawChart(scores) {
       },
       gridlines: { count: 5 },
     },
-    tooltip: {
-      isHtml: true,
-      textStyle: { 
-        fontSize: 20
-      },
-      trigger: 'both',
-      formatter: function (dataTable, row) {
-        var seconds = dataTable.getValue(row, 0);
-        return '<div style="padding:10px;">' +
-          '<strong>Seconds: ' + seconds + '</strong><br>' +
-          '</div>';
-      }
-    }
   };
 
   var chart = new google.visualization.LineChart(
     document.getElementById("chart")
   );
-  chart.draw(data, options);
 
-  google.visualization.events.addListener(chart, 'select', function() {
-    var selectedItem = chart.getSelection()[0];
-    if (selectedItem) {
-      var seconds = data.getValue(selectedItem.row, 0);
-      console.log('Selected Seconds:', seconds);
-      chart.setSelection([{row: selectedItem.row, column: 1}]);
+  google.visualization.events.addListener(chart, "select", function () {
+    var selection = chart.getSelection();
+    if (selection.length > 0) {
+      var point = selection[0];
+      var xValue = data.getValue(point.row, 0);
+      videoSeek(xValue);
     }
   });
+
+  chart.draw(data, options);
+
+  // Custom function to handle point clicks
+  function videoSeek(time) {
+    player.seekTo(time);
+  }
 }
 
 //function that looks up other judges' scores for a freestyle video
@@ -530,7 +448,7 @@ function getScores() {
   yt_link = chopLink(yt_link);
   getLinks(yt_link)
     .then((result) => {
-      const splitByJudge = result.reduce((acc, obj) => {
+      splitByJudge = result.reduce((acc, obj) => {
         const { judge, second, score } = obj;
         const rest = { second, score };
 
@@ -539,7 +457,6 @@ function getScores() {
 
         return acc;
       }, {});
-      console.log("splitbyjudge", splitByJudge);
       createDropdown(splitByJudge);
       createGraph(splitByJudge);
     })
@@ -549,10 +466,9 @@ function getScores() {
   setTimeout(function () {
     loadVideo();
     if (graphReady == false) {
-      alert("Nobody has scored this routine.");
+      // alert("Nobody has scored this routine.");
     } else {
-      //var graphTimer = setTimeout(function () { showChart(clickList, graphB); }, 500);
-      showChart(clickList, graphB);
+      // showChart(clickList, graphB);
     }
   }, 1500);
 }
@@ -562,8 +478,6 @@ function formatList() {
   for (var i = 0; i < clickList.length; i++) {
     judgeEntry.push([judgeName, yt_link, clickList[i][0], clickList[i][1]]);
   }
-  console.log(judgeEntry);
-  console.log(JSON.stringify(judgeEntry));
   fetch("http://localhost:3000/appendClicks", {
     method: "POST",
     headers: {
@@ -573,7 +487,6 @@ function formatList() {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log("data", data);
       return data;
     })
     .catch((error) => {
@@ -597,165 +510,6 @@ function getLinks(link) {
       console.error("Error fetching data:", error);
       throw error; // Re-throw the error if needed
     });
-}
-
-//sets up list of other judge scores to match the format of the program
-function loadOtherList(list) {
-  graphReady = true;
-  for (var i = 2; i < list.length; i++) {
-    var data = [];
-    data = list[i].split(",");
-    data[0] = parseFloat(data[0]);
-    data[1] = parseInt(data[1]);
-    graphB.push([data[0], data[1]]);
-  }
-  graphB.push(list[0]);
-  graphB.push(" ");
-}
-
-//adds judge's scores to db
-function makeApiCall(list) {
-  var params = {
-    spreadsheetId: "1KrN4qEuSED2x3R_Y4dOSXoHYix6ccP3SBlMMsDxgLO0",
-    range: "Sheet1!A1:FZ1000",
-    valueInputOption: "RAW",
-    insertDataOption: "OVERWRITE",
-  };
-  var valueRangeBody = {
-    range: "Sheet1!A1:FZ1000",
-    majorDimension: "ROWS",
-    values: [list],
-  };
-  var request = gapi.client.sheets.spreadsheets.values.append(
-    params,
-    valueRangeBody
-  );
-  request.then(
-    function (response) {},
-    function (reason) {
-      console.error("error: " + reason.result.error.message);
-    }
-  );
-}
-
-function showChart(listA, listB) {
-  makeApiCall(judgeEntry);
-  var breakpoint = 0;
-  var judgeB = "";
-  var judgeC = "";
-  var judgeD = "";
-  var judgeE = "";
-  for (var i = 0; i < listB.length; i++) {
-    if (listB[i] == " ") {
-      breakpoint = i;
-      judgeB = listB[i - 1];
-      break;
-    }
-  }
-  for (var a = 0; a < listA.length; a++) {
-    aX.push(listA[a][0]);
-    aY.push(listA[a][1]);
-  }
-  for (var b = 0; b < breakpoint; b++) {
-    bX.push(listB[b][0]);
-    bY.push(listB[b][1]);
-  }
-  breakpoint += 1;
-  for (var c = breakpoint; c < listB.length; c++) {
-    if (listB[c + 2] == " ") {
-      breakpoint = c + 2;
-      judgeC = listB[c + 1];
-      break;
-    } else {
-      cX.push(listB[c][0]);
-      cY.push(listB[c][1]);
-    }
-  }
-  breakpoint += 1;
-  for (var d = breakpoint; d < listB.length; d++) {
-    if (listB[d + 2] == " ") {
-      breakpoint = d + 2;
-      judgeD = listB[d + 1];
-      break;
-    } else {
-      dX.push(listB[d][0]);
-      dY.push(listB[d][1]);
-    }
-  }
-  breakpoint += 1;
-  for (var e = breakpoint; e < listB.length; e++) {
-    if (listB[e + 2] == " ") {
-      breakpoint = e + 2;
-      judgeE = listB[e + 1];
-      break;
-    } else {
-      eX.push(listB[e][0]);
-      eY.push(listB[e][1]);
-    }
-  }
-  if (isViewerMode == true) {
-    judgePick = document.getElementById("judge-pick");
-    var loopIndex = 0;
-    var judgeList = [judgeB, judgeC, judgeD, judgeE];
-    while (loopIndex < judgeList.length) {
-      if (judgeList[loopIndex] == "") {
-        loopIndex += 1;
-        continue;
-      } else {
-        var option = document.createElement("option");
-        option.text = judgeList[loopIndex];
-        judgePick.add(option);
-        loopIndex += 1;
-      }
-    }
-    $("#judge-pick").show();
-  }
-  var trace1 = {
-    x: aX,
-    y: aY,
-    mode: "lines",
-    name: judgeName,
-  };
-  var trace2 = {
-    x: bX,
-    y: bY,
-    mode: "lines",
-    name: judgeB,
-  };
-  var trace3 = {
-    x: cX,
-    y: cY,
-    mode: "lines",
-    name: judgeC,
-  };
-  var trace4 = {
-    x: dX,
-    y: dY,
-    mode: "lines",
-    name: judgeD,
-  };
-  var trace5 = {
-    x: eX,
-    y: eY,
-    mode: "lines",
-    name: judgeE,
-  };
-  var data = [trace1, trace2, trace3, trace4, trace5];
-  var layout = {
-    title: "Your Scores",
-    xaxis: {
-      title: "Time",
-      showgrid: false,
-      zeroline: false,
-      nticks: 12,
-      tickformat: ",d",
-    },
-    yaxis: {
-      title: "Score",
-      showline: false,
-    },
-  };
-  Plotly.newPlot("chart", data, layout);
 }
 
 function chopLink(link) {
