@@ -1,11 +1,7 @@
 var viewSeconds = 0;
 var judgeEntry = [];
 var clickList = [];
-var graphB = [];
-var graphC = [];
-var graphD = [];
 var judgeName = "";
-var otherJudgeData = "";
 var yt_link = "";
 var ct;
 var vt;
@@ -13,7 +9,6 @@ var positive = 0;
 var negative = 0;
 var player;
 var singleClick = 0;
-var doubleClick = 0;
 var graphReady = false;
 var isFlash = false;
 var isViewerMode = false;
@@ -28,6 +23,7 @@ var submitKey = 48;
 var submitBool = false;
 var done = false;
 var splitByJudge = [];
+var display_array = [];
 
 //loads freestyle video into the iframe
 function loadVideo() {
@@ -55,9 +51,11 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
   event.target.pauseVideo();
   if (isViewerMode) {
+    // this will need to be adjusted to be modular
     selectedJudgeIndex = judgePick.selectedIndex;
     const judgeSplitAsArray = Object.values(splitByJudge);
     selectedClicks = judgeSplitAsArray[selectedJudgeIndex];
+    console.log(configureLiveReplay());
   }
 }
 
@@ -124,7 +122,6 @@ $("html").on("keydown", function (event) {
       changeColors("pos");
     }
   } else if (event.which == doubleKey && player.getPlayerState() == 1) {
-    doubleClick += 1;
     positive += 2;
     raw = positive - negative;
     seconds = Number(player.getCurrentTime().toFixed(1));
@@ -183,10 +180,7 @@ function change() {
   });
 }
 
-function getScoreAtSecond(time) {
-  // this code should run when a selection is confirmed
-  var index = 0;
-  var display_array = [];
+function configureLiveReplay() {
   for (var o = 0; o < selectedClicks.length; o++) {
     if (o == 0) {
       if (selectedClicks[o].score == 1) {
@@ -217,8 +211,11 @@ function getScoreAtSecond(time) {
     }
     display_array.push([selectedClicks[o].second, "+" + String(positive) + " " + "-" + String(negative)]);
   }
+  return display_array;
+}
 
-  // this is the loop to hit the second timing for catch up
+function getScoreAtSecond(time) {
+  var index = 0;
   while (display_array[index][0] < time) {
     index++;
   }
@@ -282,7 +279,6 @@ function viewAdd(list) {
 }
 
 function viewTimer(list) {
-  // vt = setTimeout(viewAdd, 1000, list);
   vt = setTimeout(viewAdd, 90, list);
 }
 
@@ -308,7 +304,6 @@ function closeSave(response) {
   if (response) {
     $("#post-data").show();
     formatList();
-    showChart(clickList, graphB);
   } else {
     location.assign(
       "http://scalescollective.com/clicker/" +
@@ -496,11 +491,6 @@ function getScores() {
     });
   setTimeout(function () {
     loadVideo();
-    if (graphReady == false) {
-      // alert("Nobody has scored this routine.");
-    } else {
-      // showChart(clickList, graphB);
-    }
   }, 1500);
 }
 
