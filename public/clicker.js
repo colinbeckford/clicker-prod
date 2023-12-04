@@ -102,7 +102,7 @@ $("html").on("keydown", function (event) {
   if (event.which == negKey && player.getPlayerState() == 1) {
     negative += 1;
     raw = positive - negative;
-    seconds = Math.floor(player.getCurrentTime());
+    seconds = Number(player.getCurrentTime().toFixed(1));
     clickList.push([seconds, raw]);
     $("#click-display").text(
       "+" + String(positive) + " " + "-" + String(negative)
@@ -115,7 +115,7 @@ $("html").on("keydown", function (event) {
     singleClick += 1;
     positive += 1;
     raw = positive - negative;
-    seconds = Math.floor(player.getCurrentTime());
+    seconds = Number(player.getCurrentTime().toFixed(1));
     clickList.push([seconds, raw]);
     $("#click-display").text(
       "+" + String(positive) + " " + "-" + String(negative)
@@ -127,7 +127,7 @@ $("html").on("keydown", function (event) {
     doubleClick += 1;
     positive += 2;
     raw = positive - negative;
-    seconds = Math.floor(player.getCurrentTime());
+    seconds = Number(player.getCurrentTime().toFixed(1));
     clickList.push([seconds, raw]);
     $("#click-display").text(
       "+" + String(positive) + " " + "-" + String(negative)
@@ -184,7 +184,7 @@ function change() {
 }
 
 function viewAdd(list) {
-  viewSeconds = Math.floor(player.getCurrentTime());
+  viewSeconds = Number(player.getCurrentTime().toFixed(1));
   while (viewSeconds == list[viewIncrement].second) {
     if (viewIncrement == 0) {
       if (list[viewIncrement].score == 1) {
@@ -253,7 +253,8 @@ function viewAdd(list) {
 }
 
 function viewTimer(list) {
-  vt = setTimeout(viewAdd, 1000, list);
+  // vt = setTimeout(viewAdd, 1000, list);
+  vt = setTimeout(viewAdd, 90, list);
 }
 
 function openFlash() {
