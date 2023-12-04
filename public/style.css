@@ -47,7 +47,7 @@ li {
 }
 
 button,
-input {
+input, select, option {
   background-color: #635f56;
   color: #5bebaf;
   font-family: Courier, monospace;

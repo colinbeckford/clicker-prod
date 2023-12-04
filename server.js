@@ -40,7 +40,6 @@ app.post('/appendClicks', (req, res) => {
           console.error('Error inserting data into "clicks" table:', insertErr);
           res.status(500).json({ error: 'Internal Server Error' });
         } else {
-          console.log('Data inserted into "clicks" table:', result);
           res.json({ message: 'Data received and inserted successfully!' });
         }
       });
@@ -54,7 +53,6 @@ app.post('/appendClicks', (req, res) => {
         console.error('Error retrieving data from "clicks" table:', selectErr);
         res.status(500).json({ error: 'Internal Server Error' });
       } else {
-        console.log('Data retrieved from "clicks" table:', result);
         res.json(result);
       }
     });
