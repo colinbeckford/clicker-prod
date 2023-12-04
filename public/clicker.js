@@ -381,7 +381,7 @@ function saveData() {
   $("#scoring").show();
   judgeName = $("#judge-name").val();
   loadVideo();
-  // getLinks(yt_link);
+  getLinks(yt_link);
 }
 
 //function that looks up other judges' scores for a freestyle video
@@ -409,7 +409,6 @@ function formatList() {
   for (var i = 0; i < clickList.length; i++) {
     judgeEntry.push([judgeName, yt_link, clickList[i][0], clickList[i][1]]);
   }
-  console.log(judgeEntry);
   fetch("http://localhost:3000/appendClicks", {
     method: "POST",
     headers: {
@@ -428,25 +427,38 @@ function formatList() {
 
 //searches db for freestyle link to see if other judges scored it
 function getLinks(link) {
-  var params = {
-    spreadsheetId: "1KrN4qEuSED2x3R_Y4dOSXoHYix6ccP3SBlMMsDxgLO0",
-    range: "Sheet1!B1:B1000",
-    valueRenderOption: "FORMATTED_VALUE",
-    dateTimeRenderOption: "FORMATTED_STRING",
-  };
-  var links = gapi.client.sheets.spreadsheets.values.get(params);
-  links.then(
-    function (response) {
-      for (var i = 0; i < response.result.values.length; i++) {
-        if (response.result.values[i] == link) {
-          getOtherScores(i);
-        }
+  const fetchData = async (link) => {
+    try {
+      const response = await fetch(`http://localhost:3000/getClicks/${link}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    },
-    function (reason) {
-      console.error("error: " + reason.result.error.message);
+      const data = await response.json();
+      console.log('Data received from server:', data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
-  );
+  };
+  fetchData(link);
+  // var params = {
+  //   spreadsheetId: "1KrN4qEuSED2x3R_Y4dOSXoHYix6ccP3SBlMMsDxgLO0",
+  //   range: "Sheet1!B1:B1000",
+  //   valueRenderOption: "FORMATTED_VALUE",
+  //   dateTimeRenderOption: "FORMATTED_STRING",
+  // };
+  // var links = gapi.client.sheets.spreadsheets.values.get(params);
+  // links.then(
+  //   function (response) {
+  //     for (var i = 0; i < response.result.values.length; i++) {
+  //       if (response.result.values[i] == link) {
+  //         getOtherScores(i);
+  //       }
+  //     }
+  //   },
+  //   function (reason) {
+  //     console.error("error: " + reason.result.error.message);
+  //   }
+  // );
 }
 
 //retrieves scores from other judge from db based on freestyle link and judge index in list

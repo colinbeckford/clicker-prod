@@ -45,3 +45,18 @@ app.post('/appendClicks', (req, res) => {
         }
       });
   });
+
+  app.get('/getClicks/:link', (req, res) => {
+    const linkValue = req.params.link;
+    const selectQuery = 'SELECT * FROM clicks WHERE link = ?';
+    db.query(selectQuery, [linkValue], (selectErr, result) => {
+      if (selectErr) {
+        console.error('Error retrieving data from "clicks" table:', selectErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        console.log('Data retrieved from "clicks" table:', result);
+        res.json(result);
+      }
+    });
+  });
+  
