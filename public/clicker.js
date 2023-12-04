@@ -183,6 +183,49 @@ function change() {
   });
 }
 
+function getScoreAtSecond(time) {
+  // this code should run when a selection is confirmed
+  var index = 0;
+  var display_array = [];
+  for (var o = 0; o < selectedClicks.length; o++) {
+    if (o == 0) {
+      if (selectedClicks[o].score == 1) {
+        positive = 1;
+        negative = 0;
+      } else if (list[viewIncrement].score == 2) {
+        positive = 2;
+        negative = 0;
+      } else if (list[viewIncrement].score == -1) {
+        positive = 0;
+        negative = 1;
+      }
+    } else {
+      if (selectedClicks[o].score == selectedClicks[o - 1].score + 1) {
+        positive++;
+      } else if (
+        selectedClicks[o].score ==
+        selectedClicks[o - 1].score - 1
+      ) {
+        negative++;
+        
+      } else if (
+        selectedClicks[o].score ==
+        selectedClicks[o - 1].score + 2
+      ) {
+        positive = positive + 2;
+      }
+    }
+    display_array.push([selectedClicks[o].second, "+" + String(positive) + " " + "-" + String(negative)]);
+  }
+
+  // this is the loop to hit the second timing for catch up
+  while (display_array[index][0] < time) {
+    index++;
+  }
+  console.log("Click value at " + time + " is " + selectedClicks[index].score);
+  $("#click-display").text(display_array[index][1]);
+}
+
 function viewAdd(list) {
   viewSeconds = Number(player.getCurrentTime().toFixed(1));
   while (viewSeconds == list[viewIncrement].second) {
@@ -190,30 +233,18 @@ function viewAdd(list) {
       if (list[viewIncrement].score == 1) {
         positive = 1;
         negative = 0;
-        $("#click-display").text(
-          "+" + String(positive) + " " + "-" + String(negative)
-        );
-        viewIncrement += 1;
         if (isFlash) {
           changeColors("pos");
         }
       } else if (list[viewIncrement].score == 2) {
         positive = 2;
         negative = 0;
-        $("#click-display").text(
-          "+" + String(positive) + " " + "-" + String(negative)
-        );
-        viewIncrement += 1;
         if (isFlash) {
           changeColors("dub");
         }
       } else if (list[viewIncrement].score == -1) {
         positive = 0;
         negative = 1;
-        $("#click-display").text(
-          "+" + String(positive) + " " + "-" + String(negative)
-        );
-        viewIncrement += 1;
         if (isFlash) {
           changeColors("neg");
         }
@@ -221,33 +252,31 @@ function viewAdd(list) {
     } else {
       if (list[viewIncrement].score == list[viewIncrement - 1].score + 1) {
         positive++;
-        $("#click-display").text(
-          "+" + String(positive) + " " + "-" + String(negative)
-        );
-        viewIncrement += 1;
         if (isFlash) {
           changeColors("pos");
         }
-      } else if (list[viewIncrement].score == list[viewIncrement - 1].score - 1) {
+      } else if (
+        list[viewIncrement].score ==
+        list[viewIncrement - 1].score - 1
+      ) {
         negative++;
-        $("#click-display").text(
-          "+" + String(positive) + " " + "-" + String(negative)
-        );
-        viewIncrement += 1;
         if (isFlash) {
           changeColors("neg");
         }
-      } else if (list[viewIncrement].score == list[viewIncrement - 1].score + 2) {
+      } else if (
+        list[viewIncrement].score ==
+        list[viewIncrement - 1].score + 2
+      ) {
         positive = positive + 2;
-        $("#click-display").text(
-          "+" + String(positive) + " " + "-" + String(negative)
-        );
-        viewIncrement += 1;
         if (isFlash) {
           changeColors("dub");
         }
       }
     }
+    $("#click-display").text(
+      "+" + String(positive) + " " + "-" + String(negative)
+    );
+    viewIncrement += 1;
   }
   viewTimer(list);
 }
@@ -436,6 +465,7 @@ function drawChart(scores) {
   // Custom function to handle point clicks
   function videoSeek(time) {
     player.seekTo(time);
+    getScoreAtSecond(time);
   }
 }
 

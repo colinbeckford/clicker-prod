@@ -161,3 +161,8 @@ button:hover {
   width: 1280px;
   height: 720px;
 }
+
+#click-display {
+  padding: 35px;
+  font-size: 35px;
+}
