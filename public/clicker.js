@@ -205,8 +205,6 @@ function chopLink(link) {
   return link;
 }
 
-  
-
 // api call to get other instances of freestyle scored
 function getLinks(link) {
   return fetch(`http://localhost:3000/getClicks/${link}`)
@@ -405,7 +403,6 @@ function onPlayerStateChange(event) {
   }
 }
 
-
 // changing the colors upon click
 function changeColors(type) {
   if (type == "pos") {
@@ -588,6 +585,17 @@ function formatList() {
   for (var i = 0; i < clickList.length; i++) {
     judgeEntry.push([judgeName, yt_link, clickList[i][0], clickList[i][1]]);
   }
+  console.log(judgeEntry);
+  const graphData = {};
+  judgeEntry.forEach(([judgeName, yt_link, second, score]) => {
+    if (!graphData[judgeName]) {
+      graphData[judgeName] = [];
+    }
+
+    graphData[judgeName].push({ second, score });
+  });
+  console.log(graphData);
+  createGraph(graphData);
   fetch("http://localhost:3000/appendClicks", {
     method: "POST",
     headers: {

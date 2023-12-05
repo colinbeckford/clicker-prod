@@ -167,3 +167,8 @@ button:hover {
   padding: 35px;
   font-size: 35px;
 }
+
+#post-data {
+  padding: 20px;
+  font-size: 20px;
+}
