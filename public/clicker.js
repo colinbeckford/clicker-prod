@@ -231,7 +231,15 @@ function createDropdown(options) {
     option.text = judge;
     judgePick.add(option);
   }
+  document.getElementById("judge-pick").addEventListener("change", changeJudge);
   $("#judge-pick").show();
+}
+
+
+function changeJudge() {
+  console.log("Change Judge");
+  selectJudge();
+  
 }
 
 // function that calls drawchart
@@ -366,12 +374,15 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
   event.target.pauseVideo();
   if (isViewerMode) {
-    // this will need to be adjusted to be modular - NEW LISTENER FOR JUDGEPICK
-    selectedJudgeIndex = judgePick.selectedIndex;
-    const judgeSplitAsArray = Object.values(splitByJudge);
-    selectedClicks = judgeSplitAsArray[selectedJudgeIndex];
-    configureLiveReplay();
+    selectJudge();
   }
+}
+
+function selectJudge() {
+  selectedJudgeIndex = judgePick.selectedIndex;
+  const judgeSplitAsArray = Object.values(splitByJudge);
+  selectedClicks = judgeSplitAsArray[selectedJudgeIndex];
+  configureLiveReplay();
 }
 
 // calls view timer function if the user wants to view scores - need to review the done part
@@ -427,6 +438,8 @@ function change() {
 
 // loops through scoreset and refactors the scores into normal clicker values of +,-
 function configureLiveReplay() {
+  display_array.length = 0;
+  console.log(selectedClicks);
   for (var o = 0; o < selectedClicks.length; o++) {
     if (o == 0) {
       if (selectedClicks[o].score == 1) {
@@ -453,6 +466,7 @@ function configureLiveReplay() {
       "+" + String(positive) + " " + "-" + String(negative),
     ]);
   }
+  console.log(display_array);
   return display_array;
 }
 
@@ -464,12 +478,10 @@ function getScoreAtSecond(time) {
   }
   viewIncrement = index;
   resumeTimer();
-  $("#click-display").text(display_array[index][1]);
 }
 
 function viewAdd(list) {
   viewSeconds = Number(player.getCurrentTime().toFixed(1));
-  console.log(viewIncrement, viewSeconds, list[viewIncrement]);
   while (viewSeconds == list[viewIncrement].second) {
     if (viewIncrement == 0) {
       if (list[viewIncrement].score == 1) {
