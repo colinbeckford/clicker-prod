@@ -25,6 +25,7 @@ var done = false;
 var splitByJudge = [];
 var display_array = [];
 var isPaused = false;
+var previousTime;
 
 // css functions to hide components, assigning keys, last part ?
 $(document).ready(function () {
@@ -194,8 +195,8 @@ function chopLink(link) {
   if (link.includes("list")) {
     link = link.slice(0, link.indexOf("&"));
   }
-  if (link.includes("&si")) {
-    link = link.slice(0, link.indexOf("&"));
+  if (link.includes("?si")) {
+    link = link.slice(0, link.indexOf("?"));
   }
   if (link.includes("&ab")) {
     link = link.slice(0, link.indexOf("&"));
@@ -203,6 +204,8 @@ function chopLink(link) {
 
   return link;
 }
+
+  
 
 // api call to get other instances of freestyle scored
 function getLinks(link) {
@@ -231,15 +234,8 @@ function createDropdown(options) {
     option.text = judge;
     judgePick.add(option);
   }
-  document.getElementById("judge-pick").addEventListener("change", changeJudge);
+  document.getElementById("judge-pick").addEventListener("change", selectJudge);
   $("#judge-pick").show();
-}
-
-
-function changeJudge() {
-  console.log("Change Judge");
-  selectJudge();
-  
 }
 
 // function that calls drawchart
@@ -378,6 +374,14 @@ function onPlayerReady(event) {
   }
 }
 
+function checkCurrentTime() {
+  const currentTime = player.getCurrentTime();
+  if (Math.abs(currentTime - previousTime) > 1.3) {
+    getScoreAtSecond(Number(currentTime.toFixed(1)));
+  }
+  previousTime = currentTime;
+}
+
 function selectJudge() {
   selectedJudgeIndex = judgePick.selectedIndex;
   const judgeSplitAsArray = Object.values(splitByJudge);
@@ -388,6 +392,8 @@ function selectJudge() {
 // calls view timer function if the user wants to view scores - need to review the done part
 function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && !done) {
+    previousTime = player.getCurrentTime();
+    setInterval(checkCurrentTime, 1000);
     if (isViewerMode) {
       viewTimer(selectedClicks);
     }
@@ -398,6 +404,7 @@ function onPlayerStateChange(event) {
     resumeTimer();
   }
 }
+
 
 // changing the colors upon click
 function changeColors(type) {
@@ -439,7 +446,6 @@ function change() {
 // loops through scoreset and refactors the scores into normal clicker values of +,-
 function configureLiveReplay() {
   display_array.length = 0;
-  console.log(selectedClicks);
   for (var o = 0; o < selectedClicks.length; o++) {
     if (o == 0) {
       if (selectedClicks[o].score == 1) {
@@ -466,7 +472,6 @@ function configureLiveReplay() {
       "+" + String(positive) + " " + "-" + String(negative),
     ]);
   }
-  console.log(display_array);
   return display_array;
 }
 
