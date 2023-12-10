@@ -7,12 +7,14 @@ const app = express();
 const port = 3000;
 
 // Create a MySQL database connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'becko',
-  database: 'clicker',
-});
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: 'becko',
+//   database: 'clicker',
+// });
+
+const db = mysql.createConnection(process.env.JAWSDB_URL);
 
 // Check the connection
 db.connect(err => {
