@@ -14,7 +14,6 @@ const app = express();
 const port = 3000;
 
 // Create a MySQL database connection
-<<<<<<< HEAD
 const db = mysql.createConnection({
   host: dbHost,
   port: dbPort,
@@ -22,16 +21,6 @@ const db = mysql.createConnection({
   password: dbPassword,
   database: dbDatabase,
 });
-=======
-// const db = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: 'becko',
-//   database: 'clicker',
-// });
-
-const db = mysql.createConnection(process.env.JAWSDB_URL);
->>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
 
 // Check the connection
 db.connect(err => {
@@ -48,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the server
 
-app.listen(port, () => {
+app.listen((process.env.PORT || 3000), () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
