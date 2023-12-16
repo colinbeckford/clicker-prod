@@ -1,4 +1,3 @@
-
 // simple data values
 var judgeName = ""; // string for name of judge
 var youtubeLink = ""; // string for freestyle link
@@ -6,7 +5,7 @@ var positiveScore = 0; // positive clicks
 var negativeScore = 0; // negative clicks
 
 // html objects
-var youtubePlayer; // youtube video 
+var player; // youtube video
 var judgeSelect; // select object for judge dropdown
 
 // indexes
@@ -16,24 +15,24 @@ var replayDataIndex = 0; // value for position in array of viewing scores
 // booleans
 var isFlash = false; // boolean for if video should have flash border
 var isReplayMode = false; // boolean for if judge is viewing
-var isPaused = false; // boolean for if video is paused for timer purposes 
+var isPaused = false; // boolean for if video is paused for timer purposes
 var canSubmit = false; // boolean for submitting scores - maybe i can remove this
 var done = false; // boolean for video playing - maybe i can remove this
 
 // list objects
 var importData = []; // object that features the clicks by each judge for a specific freestyle
 var replayData = []; // unformatted array of clicks for individual judge on view
-var displayData = []; // configured array with text for clicks 
+var displayData = []; // configured array with text for clicks
 var initialExport = []; // list of clicks on score
 var formattedExport = []; // array for formatted version of clicks that gets appended to db
 
 // timer data
 var replayTimer; // timeout object for viewing
 var viewSeconds = 0; // timer for display scoresviewseconds
-var seekMarker;  // marker for checking if user manually seeked 
+var seekMarker; // marker for checking if user manually seeked
 
-// keybinds 
-var positiveKey = 75;  
+// keybinds
+var positiveKey = 75;
 var negativeKey = 74;
 var doubleKey = 50;
 var submitKey = 48;
@@ -67,11 +66,14 @@ $(document).ready(function () {
 
 // key click functions
 $("html").on("keydown", function (event) {
-  if (event.which == negativeKey && youtubePlayer.getyoutubePlayerState() == 1) {
+  if (
+    event.which == negativeKey &&
+    player.getPlayerState() == 1
+  ) {
     canSubmit = true;
     negativeScore += 1;
     raw = positiveScore - negativeScore;
-    seconds = Number(youtubePlayer.getCurrentTime().toFixed(1));
+    seconds = Number(player.getCurrentTime().toFixed(1));
     initialExport.push([seconds, raw]);
     $("#click-display").text(
       "+" + String(positiveScore) + " " + "-" + String(negativeScore)
@@ -79,11 +81,14 @@ $("html").on("keydown", function (event) {
     if (isFlash == true) {
       changeColors("neg");
     }
-  } else if (event.which == positiveKey && youtubePlayer.getyoutubePlayerState() == 1) {
+  } else if (
+    event.which == positiveKey &&
+    player.getPlayerState() == 1
+  ) {
     canSubmit = true;
     positiveScore += 1;
     raw = positiveScore - negativeScore;
-    seconds = Number(youtubePlayer.getCurrentTime().toFixed(1));
+    seconds = Number(player.getCurrentTime().toFixed(1));
     initialExport.push([seconds, raw]);
     $("#click-display").text(
       "+" + String(positiveScore) + " " + "-" + String(negativeScore)
@@ -91,11 +96,14 @@ $("html").on("keydown", function (event) {
     if (isFlash == true) {
       changeColors("pos");
     }
-  } else if (event.which == doubleKey && youtubePlayer.getyoutubePlayerState() == 1) {
+  } else if (
+    event.which == doubleKey &&
+    player.getPlayerState() == 1
+  ) {
     canSubmit = true;
     positiveScore += 2;
     raw = positiveScore - negativeScore;
-    seconds = Number(youtubePlayer.getCurrentTime().toFixed(1));
+    seconds = Number(player.getCurrentTime().toFixed(1));
     initialExport.push([seconds, raw]);
     $("#click-display").text(
       "+" + String(positiveScore) + " " + "-" + String(negativeScore)
@@ -105,7 +113,7 @@ $("html").on("keydown", function (event) {
     }
   } else if (event.which == submitKey && canSubmit == true) {
     isReplayMode = false;
-    youtubePlayer.stopVideo();
+    player.stopVideo();
     var confirmSave = setTimeout(openSave, 500);
     $("#query-link").html(
       "http://scalescollective.com/clicker/" + "?link=" + youtubeLink
@@ -348,35 +356,35 @@ function drawChart(scores) {
 
 // skips to specific second in youtube video and logs the clicker score at the time
 function videoSeek(time) {
-  youtubePlayer.seekTo(time);
+  player.seekTo(time);
   getScoreAtSecond(time);
 }
 
-// creates video youtubePlayer
+// creates video player
 function loadVideo() {
-  document.getElementById("video").innerHTML = "<div id='youtubePlayer'></div>";
+  document.getElementById("video").innerHTML = "<div id='player'></div>";
   var tag = document.createElement("script");
   tag.src = "https://www.youtube.com/iframe_api";
   var firstScriptTag = document.getElementsByTagName("script")[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 }
 
-// loads video into youtube youtubePlayer - need to add functionality for loading new videos
+// loads video into youtube player - need to add functionality for loading new videos
 function onYouTubeIframeAPIReady() {
   youtubeLink = chopLink(youtubeLink);
-  youtubePlayer = new YT.Player("youtubePlayer", {
+  player = new YT.Player("player", {
     width: 1280,
     height: 720,
     videoId: youtubeLink,
     events: {
-      onReady: onYoutubePlayerReady,
-      onStateChange: onYoutubePlayerStateChange,
+      onReady: onplayerReady,
+      onStateChange: onPlayerStateChange,
     },
   });
 }
 
 // pauses video onload and retrieves index of selected judge
-function onYoutubePlayerReady(event) {
+function onplayerReady(event) {
   event.target.pauseVideo();
   if (isReplayMode) {
     selectJudge();
@@ -384,7 +392,7 @@ function onYoutubePlayerReady(event) {
 }
 
 function checkCurrentTime() {
-  const currentTime = youtubePlayer.getCurrentTime();
+  const currentTime = player.getCurrentTime();
   if (Math.abs(currentTime - seekMarker) > 1.3) {
     getScoreAtSecond(Number(currentTime.toFixed(1)));
   }
@@ -399,17 +407,17 @@ function selectJudge() {
 }
 
 // calls view timer function if the user wants to view scores - need to review the done part
-function onYoutubePlayerStateChange(event) {
-  if (event.data == YT.youtubePlayerState.PLAYING && !done) {
-    seekMarker = youtubePlayer.getCurrentTime();
+function onPlayerStateChange(event) {
+  if (event.data == YT.PlayerState.PLAYING && !done) {
+    seekMarker = player.getCurrentTime();
     setInterval(checkCurrentTime, 1000);
     if (isReplayMode) {
       replayTimer(replayData);
     }
     done = true;
-  } else if (event.data == YT.youtubePlayerState.PAUSED && done) {
+  } else if (event.data == YT.PlayerState.PAUSED && done) {
     pauseTimer();
-  } else if (event.data == YT.youtubePlayerState.PLAYING && done) {
+  } else if (event.data == YT.PlayerState.PLAYING && done) {
     resumeTimer();
   }
 }
@@ -417,33 +425,33 @@ function onYoutubePlayerStateChange(event) {
 // changing the colors upon click
 function changeColors(type) {
   if (type == "pos") {
-    $("#youtubePlayer").css({
+    $("#player").css({
       "border-color": "#008000",
       "border-width": "5px",
       "border-style": "solid",
       "border-radius": "10px",
     });
   } else if (type == "neg") {
-    $("#youtubePlayer").css({
+    $("#player").css({
       "border-color": "#FF0000",
       "border-width": "5px",
       "border-style": "solid",
       "border-radius": "10px",
     });
   } else if (type == "dub") {
-    $("#youtubePlayer").css({
+    $("#player").css({
       "border-color": "#00FFFF",
       "border-width": "5px",
       "border-style": "solid",
       "border-radius": "10px",
     });
   }
-  var flashTimer = setTimeout("change()", 200); 
+  var flashTimer = setTimeout("change()", 200);
 }
 
 // resets the css around the video in between clicks
 function change() {
-  $("#youtubePlayer").css({
+  $("#player").css({
     "border-color": "#635F56",
     "border-width": "5px",
     "border-style": "solid",
@@ -494,7 +502,7 @@ function getScoreAtSecond(time) {
 }
 
 function viewAdd(list) {
-  viewSeconds = Number(youtubePlayer.getCurrentTime().toFixed(1));
+  viewSeconds = Number(player.getCurrentTime().toFixed(1));
   while (viewSeconds == list[replayDataIndex].second) {
     if (replayDataIndex == 0) {
       if (list[replayDataIndex].score == 1) {
@@ -594,7 +602,12 @@ function closeSave(response) {
 // creates object to append to db after judge scores freestyle
 function formatList() {
   for (var i = 0; i < initialExport.length; i++) {
-    formattedExport.push([judgeName, youtubeLink, initialExport[i][0], initialExport[i][1]]);
+    formattedExport.push([
+      judgeName,
+      youtubeLink,
+      initialExport[i][0],
+      initialExport[i][1],
+    ]);
   }
   const graphData = {};
   formattedExport.forEach(([judgeName, youtubeLink, second, score]) => {

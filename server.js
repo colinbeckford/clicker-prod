@@ -16,6 +16,7 @@ const port = 3000;
 // Create a MySQL database connection
 const db = mysql.createConnection({
   host: dbHost,
+  port: dbPort,
   user: dbUser,
   password: dbPassword,
   database: dbDatabase,
@@ -35,6 +36,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the server
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
