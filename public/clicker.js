@@ -5,7 +5,11 @@ var positiveScore = 0; // positive clicks
 var negativeScore = 0; // negative clicks
 
 // html objects
+<<<<<<< HEAD
 var player; // youtube video
+=======
+var player; // youtube video 
+>>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
 var judgeSelect; // select object for judge dropdown
 
 // indexes
@@ -66,10 +70,14 @@ $(document).ready(function () {
 
 // key click functions
 $("html").on("keydown", function (event) {
+<<<<<<< HEAD
   if (
     event.which == negativeKey &&
     player.getPlayerState() == 1
   ) {
+=======
+  if (event.which == negativeKey && player.getPlayerState() == 1) {
+>>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
     canSubmit = true;
     negativeScore += 1;
     raw = positiveScore - negativeScore;
@@ -81,10 +89,14 @@ $("html").on("keydown", function (event) {
     if (isFlash == true) {
       changeColors("neg");
     }
+<<<<<<< HEAD
   } else if (
     event.which == positiveKey &&
     player.getPlayerState() == 1
   ) {
+=======
+  } else if (event.which == positiveKey && player.getPlayerState() == 1) {
+>>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
     canSubmit = true;
     positiveScore += 1;
     raw = positiveScore - negativeScore;
@@ -96,10 +108,14 @@ $("html").on("keydown", function (event) {
     if (isFlash == true) {
       changeColors("pos");
     }
+<<<<<<< HEAD
   } else if (
     event.which == doubleKey &&
     player.getPlayerState() == 1
   ) {
+=======
+  } else if (event.which == doubleKey && player.getPlayerState() == 1) {
+>>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
     canSubmit = true;
     positiveScore += 2;
     raw = positiveScore - negativeScore;
@@ -372,7 +388,11 @@ function loadVideo() {
 // loads video into youtube player - need to add functionality for loading new videos
 function onYouTubeIframeAPIReady() {
   youtubeLink = chopLink(youtubeLink);
+<<<<<<< HEAD
   player = new YT.Player("player", {
+=======
+  player = new YT.Player("youtubePlayer", {
+>>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
     width: 1280,
     height: 720,
     videoId: youtubeLink,
@@ -407,7 +427,11 @@ function selectJudge() {
 }
 
 // calls view timer function if the user wants to view scores - need to review the done part
+<<<<<<< HEAD
 function onPlayerStateChange(event) {
+=======
+function onYoutubePlayerStateChange(event) {
+>>>>>>> 6495b9d5f05e69257e568b22eebbb3b8b60296e3
   if (event.data == YT.PlayerState.PLAYING && !done) {
     seekMarker = player.getCurrentTime();
     setInterval(checkCurrentTime, 1000);
