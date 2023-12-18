@@ -44,10 +44,10 @@ $(document).ready(function () {
   $("#input-assign").hide();
   $("#judge-select").hide();
   $("#scoring").hide();
-  $("#positiveScore-key").on("keydown", function (pos_e) {
+  $("#positive-key").on("keydown", function (pos_e) {
     positiveKey = pos_e.keyCode;
   });
-  $("#negativeScore-key").on("keydown", function (neg_e) {
+  $("#negative-key").on("keydown", function (neg_e) {
     negativeKey = neg_e.keyCode;
   });
   $("#double-key").on("keydown", function (double_e) {
