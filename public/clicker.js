@@ -37,6 +37,9 @@ var negativeKey = 74;
 var doubleKey = 50;
 var submitKey = 48;
 
+// ticks for graph
+var ticks = [];
+
 // css functions to hide components, assigning keys, last part ?
 $(document).ready(function () {
   let myurl = new URL(window.location.href);
@@ -309,32 +312,7 @@ function drawChart(scores) {
     },
     hAxis: {
       title: "Time",
-      ticks: [
-        {v: 15, f: '0:15'}, 
-        {v: 30, f: '0:30'}, 
-        {v: 45, f: '0:45'}, 
-        {v: 60, f: '1:00'}, 
-        {v: 75, f: '1:15'}, 
-        {v: 90, f: '1:30'}, 
-        {v: 105, f: '1:45'}, 
-        {v: 120, f: '2:00'}, 
-        {v: 135, f: '2:15'}, 
-        {v: 150, f: '2:30'}, 
-        {v: 165, f: '2:45'}, 
-        {v: 180, f: '3:00'}, 
-        {v: 195, f: '3:15'}, 
-        {v: 210, f: '3:30'}, 
-        {v: 225, f: '3:45'}, 
-        {v: 240, f: '4:00'}, 
-        {v: 255, f: '4:15'}, 
-        {v: 270, f: '4:30'}, 
-        {v: 285, f: '4:45'}, 
-        {v: 300, f: '5:00'}, 
-        {v: 315, f: '5:15'}, 
-        {v: 330, f: '5:30'}, 
-        {v: 345, f: '5:45'}, 
-        {v: 360, f: '6:00'}
-    ],
+      ticks: ticks,
       titleTextStyle: {
         color: "#5bebaf",
       },
@@ -616,6 +594,15 @@ function closeSave(response) {
   }
 }
 
+function generateTimeTicks(minSeconds, maxSeconds) {
+    for (var totalSeconds = minSeconds; totalSeconds <= maxSeconds; totalSeconds += 15) {
+        var minutesPart = Math.floor(totalSeconds / 60);
+        var secondsPart = totalSeconds % 60;
+        var formattedTime = minutesPart + ':' + (secondsPart < 10 ? '0' : '') + secondsPart;
+        ticks.push({ v: totalSeconds, f: formattedTime });
+    }
+}
+
 // creates object to append to db after judge scores freestyle
 function formatList() {
   for (var i = 0; i < initialExport.length; i++) {
@@ -626,6 +613,7 @@ function formatList() {
       initialExport[i][1],
     ]);
   }
+  generateTimeTicks(Math.floor(formattedExport[0][2]), Math.ceil(formattedExport[formattedExport.length-1][2]));
   const graphData = {};
   formattedExport.forEach(([judgeName, youtubeLink, second, score]) => {
     if (!graphData[judgeName]) {
