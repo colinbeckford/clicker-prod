@@ -590,6 +590,10 @@ function closeSave(response) {
   }
 }
 
+function closeKeybind() {
+  document.getElementById("input-assign").style.display = "none";
+}
+
 // creates object to append to db after judge scores freestyle
 function formatList() {
   for (var i = 0; i < initialExport.length; i++) {
