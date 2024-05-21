@@ -12,7 +12,7 @@ const path = require('path');
 const mysql = require('mysql2');
 
 const app = express();
-const port = 3333;
+const port = 3000;
 
 // Create a MySQL database connection
 // const db = mysql.createConnection({
@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Start the server
 
 app.listen((process.env.PORT || port), () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
 
 process.on('exit', () => {

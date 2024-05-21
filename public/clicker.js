@@ -315,7 +315,7 @@ function chopLink(link) {
 
 // api call to get other instances of freestyle scored
 function getScores(link) {
-  return fetch(`http://localhost:3000/getClicks/${link}`)
+  return fetch(`/getClicks/${link}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -332,7 +332,7 @@ function getScores(link) {
 }
 
 function getJudges() {
-  return fetch(`http://localhost:3000/getJudges`)
+  return fetch(`/getJudges`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -349,7 +349,7 @@ function getJudges() {
 }
 
 function getFreestyles() {
-  return fetch(`http://localhost:3000/getLinks`)
+  return fetch(`/getLinks`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -366,7 +366,7 @@ function getFreestyles() {
 }
 
 function appendClicks() {
-  fetch("http://localhost:3000/appendClicks", {
+  fetch("/appendClicks", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
