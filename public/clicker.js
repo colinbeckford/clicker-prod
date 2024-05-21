@@ -416,7 +416,6 @@ function createDropdown(options) {
     var option = $("<option></option>").val(judge).text(judge);
     $("#judge-pick").append(option);
   }
-  openSelect();
 }
 
 // function that calls drawchart
@@ -591,7 +590,6 @@ function generateTimeTicks(lists) {
 function videoSeek(time) {
   player.seekTo(time);
   // maybe this breaks something? maybe only for isReplayMode?
-  console.log("Video seek");
   selectJudge();
   checkCurrentTime(time);
 }
@@ -658,7 +656,6 @@ function checkCurrentTime(time) {
 function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
     wasPaused = false;
-    console.log("yt state player");
     selectJudge();
     seekMarker = player.getCurrentTime();
     // identify what this is for
