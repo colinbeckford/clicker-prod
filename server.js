@@ -49,13 +49,12 @@ app.post('/appendClicks', (req, res) => {
           console.error('Error inserting data into "clicks" table:', insertErr);
           res.status(500).json({ error: 'Internal Server Error' });
         } else {
-          console.log('Data inserted into "clicks" table:', result);
           res.json({ message: 'Data received and inserted successfully!' });
         }
       });
   });
 
-  app.get('/getClicks/:link', (req, res) => {
+app.get('/getClicks/:link', (req, res) => {
     const linkValue = req.params.link;
     const selectQuery = 'SELECT * FROM clicks WHERE link = ?';
     db.query(selectQuery, [linkValue], (selectErr, result) => {
@@ -63,9 +62,31 @@ app.post('/appendClicks', (req, res) => {
         console.error('Error retrieving data from "clicks" table:', selectErr);
         res.status(500).json({ error: 'Internal Server Error' });
       } else {
-        console.log('Data retrieved from "clicks" table:', result);
+        res.json(result);
+      }
+    });
+  });
+
+  app.get('/getJudges', (req, res) => {
+    const selectQuery = 'SELECT judge, COUNT(DISTINCT link) AS count FROM clicks GROUP BY judge ORDER BY count DESC';
+    db.query(selectQuery, (selectErr, result) => {
+      if (selectErr) {
+        console.error('Error retrieving data from "clicks" table:', selectErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
         res.json(result);
       }
     });
   });
   
+  app.get('/getLinks', (req, res) => {
+    const selectQuery = 'SELECT link, COUNT(DISTINCT judge) AS count FROM clicks GROUP BY link ORDER BY count DESC';
+    db.query(selectQuery, (selectErr, result) => {
+      if (selectErr) {
+        console.error('Error retrieving data from "clicks" table:', selectErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        res.json(result);
+      }
+    });
+  });

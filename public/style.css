@@ -38,12 +38,30 @@ select {
   width: max-content;
 }
 
+.google-visualization-tooltip {
+  font-family: Courier, monospace !important;
+  font-size: 20px !important;
+  color: #5bebaf !important;
+  background-color: #383838 !important;
+  padding: 10px 10px 0px 10px !important;
+  margin: 0 auto !important;
+  display: block !important;
+  text-align: center !important;
+}
+
 h1, h3 {
   margin: 0 auto !important;
 }
 
 li {
   font-family: Courier, monospace;
+}
+
+a {
+  font-family: Courier, monospace;
+  color: #5bebaf;
+  font-size: 20px;
+
 }
 
 button,
@@ -84,6 +102,16 @@ input[type="checkbox"] {
 }
 
 input[type="text"] {
+  width: 20px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  margin: 0 auto;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+#judge-name, #yt-link {
   width: 200px;
   align-items: center;
   justify-content: center;
@@ -91,6 +119,15 @@ input[type="text"] {
   margin: 0 auto;
   margin-top: 5px;
   margin-bottom: 15px;
+}
+
+#positive-key, #negative-key, #double-key, #submit-key {
+  width: 50px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  /* margin: 0 auto; */
+  margin: 10px;
 }
 
 input[type="checkbox"]:checked {
@@ -136,6 +173,10 @@ button:hover {
   border-radius: 10px;
 }
 
+#keybinds {
+  display: flex;
+}
+
 .btn {
   display: flex;
   width: 50%;
@@ -159,6 +200,7 @@ button:hover {
 }
 
 #chart {
+  margin-top: 50px;
   width: 1280px;
   height: 720px;
 }
@@ -172,3 +214,20 @@ button:hover {
   padding: 20px;
   font-size: 20px;
 }
+
+#flash-prompt {
+  display: none;
+}
+
+#inputs-popup {
+  display: none;
+}
+
+#scoring {
+  display: none;
+}
+
+#judge-select {
+  display: none;
+}
+
