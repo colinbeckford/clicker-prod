@@ -43,6 +43,9 @@ var negativeKey = 74;
 var doubleKey = 50;
 var submitKey = 48;
 
+// ticks for graph
+var ticks = [];
+
 var chartSelection = null;
 
 // css functions to hide components, assigning keys, and autofill name/link if applicable
@@ -515,6 +518,7 @@ var options = {
   },
   hAxis: {
       title: "Time",
+      ticks: ticks,
       ticks: ticks,
       titleTextStyle: {
           color: "#5bebaf",
