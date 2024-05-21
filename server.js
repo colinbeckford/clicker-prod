@@ -4,6 +4,7 @@ const dbPort = process.env.DB_PORT;
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
 const dbDatabase = process.env.DB_DATABASE;
+const dbUrl = process.env.JAWSDB_URL;
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -11,16 +12,18 @@ const path = require('path');
 const mysql = require('mysql2');
 
 const app = express();
-const port = 3000;
+const port = 3333;
 
 // Create a MySQL database connection
-const db = mysql.createConnection({
-  host: dbHost,
-  port: dbPort,
-  user: dbUser,
-  password: dbPassword,
-  database: dbDatabase,
-});
+// const db = mysql.createConnection({
+//   host: dbHost,
+//   port: dbPort,
+//   user: dbUser,
+//   password: dbPassword,
+//   database: dbDatabase,
+// });
+
+const db = mysql.createConnection(dbUrl);
 
 // Check the connection
 db.connect(err => {
@@ -37,8 +40,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the server
 
-app.listen((process.env.PORT || 3000), () => {
+app.listen((process.env.PORT || port), () => {
   console.log(`Server is running on http://localhost:${port}`);
+});
+
+process.on('exit', () => {
+  connection.end();
 });
 
 app.post('/appendClicks', (req, res) => {
