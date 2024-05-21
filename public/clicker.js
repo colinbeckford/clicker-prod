@@ -549,10 +549,17 @@ var options = {
   // dont show chart till import done
 
   google.visualization.events.addListener(chart, 'onmouseover', function(e) {
-    // Return false to prevent default action
     return false;
 });
- 
+
+google.visualization.events.addListener(chart, "select", function () {
+  var selection = chart.getSelection();
+  if (selection.length > 0) {
+    var point = selection[0];
+    var xValue = data.getValue(point.row, 0);
+    videoSeek(xValue);
+  }
+})
 }
 
 function convertIntegerToTime(number) {
