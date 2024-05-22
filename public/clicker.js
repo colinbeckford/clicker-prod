@@ -27,6 +27,7 @@ var initialExport = []; // list of clicks on score
 var formattedExport = []; // array for formatted version of clicks that gets appended to db
 var judgeNames = [];
 var ticks = [];
+var resultArray = [];
 
 // timer data
 var replayTimeout; // timeout object for viewing
@@ -43,10 +44,10 @@ var negativeKey = 74;
 var doubleKey = 50;
 var submitKey = 48;
 
-// ticks for graph
-var ticks = [];
-
 var chartSelection = null;
+var chart;
+var chartOptions;
+var data;
 
 // css functions to hide components, assigning keys, and autofill name/link if applicable
 $(document).ready(function () {
@@ -90,48 +91,39 @@ $("html").on("keydown", function (event) {
     raw = positiveScore - negativeScore;
     seconds = Number(player.getCurrentTime().toFixed(1));
     initialExport.push([seconds, raw]);
-    $("#click-display").text(
-      "+" + String(positiveScore) + " " + "-" + String(negativeScore)
-    );
+    $("#negative-display").text("-" + String(negativeScore));
     if (isFlash == true) {
       changeColors("neg");
     }
-  // positive click
+    // positive click
   } else if (event.which == positiveKey && player.getPlayerState() == 1) {
     canSubmit = true;
     positiveScore += 1;
     raw = positiveScore - negativeScore;
     seconds = Number(player.getCurrentTime().toFixed(1));
     initialExport.push([seconds, raw]);
-    $("#click-display").text(
-      "+" + String(positiveScore) + " " + "-" + String(negativeScore)
-    );
+    $("#positive-display").text("+" + String(positiveScore));
     if (isFlash == true) {
       changeColors("pos");
     }
-  // double click
+    // double click
   } else if (event.which == doubleKey && player.getPlayerState() == 1) {
     canSubmit = true;
     positiveScore += 2;
     raw = positiveScore - negativeScore;
     seconds = Number(player.getCurrentTime().toFixed(1));
     initialExport.push([seconds, raw]);
-    $("#click-display").text(
-      "+" + String(positiveScore) + " " + "-" + String(negativeScore)
-    );
+    $("#positive-display").text("+" + String(positiveScore));
     if (isFlash == true) {
       changeColors("dub");
     }
-  // submit
+    // submit
   } else if (event.which == submitKey && canSubmit == true) {
     isReplayMode = false;
     clearInterval(checkInterval);
     player.stopVideo();
     // timer to open save menu - could fix styling logic here
     var confirmSave = setTimeout(openSave, 500);
-    $("#query-link").html(
-      '<a href="http://scalescollective.com/clicker/?link=' + youtubeLink + '">Link to freestyle on Scales Clicker' + '</a>'
-  );
   }
 });
 
@@ -150,25 +142,17 @@ function reset() {
   viewSeconds = 0;
   seekMarker = 0;
   document.getElementById("chart").innerHTML = "";
-  document.getElementById("click-display").innerHTML = "";
   document.getElementById("judge-select").innerHTML = "";
+  document.getElementById("positive-display").innerHTML = "";
+  document.getElementById("negative-display").innerHTML = "";
   clearInterval(replayInterval);
   chartSelection = null;
 }
 
-// open howto
-function openHowto() {
-  $("#instructions").show();
-}
-
-// close howto
-function closeHowto() {
-  $("#instructions").hide();
-}
-
-// popup for scoring
-function openScoring() {
-  $("#scoring").show();
+// hide intro css
+function closeIntro() {
+  $("#intro").hide();
+  $("#main").show();
 }
 
 // popup for flash option
@@ -187,8 +171,7 @@ function closeFlash(response) {
   if (isReplayMode) {
     importScores();
     openSelect();
-  }
-  else {
+  } else {
     openInputs();
   }
 }
@@ -202,7 +185,6 @@ function openSave() {
 function openPost() {
   $("#post-data").show();
 }
-
 
 // closes save popup
 function closeSave(response) {
@@ -229,7 +211,7 @@ function openSelect() {
   setTimeout(function () {
     if (isReplayMode) {
       createDropdown(importData);
-    };
+    }
   }, 1000);
 }
 
@@ -243,6 +225,11 @@ function openInputs() {
   $("#inputs-popup").show();
 }
 
+// opens the scoring display
+function openScoring() {
+  $("#scoring").show();
+}
+
 // closes the inputs for judge name and keybinds
 function closeInputs() {
   judgeName = $("#judge-name").val();
@@ -251,14 +238,13 @@ function closeInputs() {
   setTimeout(function () {
     if (isReplayMode) {
       createDropdown(importData);
-    };
+    }
   }, 1000);
-
 }
 
 // returns boolean if the youtube player has been initialized
 function playerExists() {
-  return player && typeof player.loadVideoById === 'function';
+  return player && typeof player.loadVideoById === "function";
 }
 
 function loadData(replay) {
@@ -268,8 +254,10 @@ function loadData(replay) {
     reset();
     player.cueVideoById(youtubeLink);
   }
-  loadVideo();
+  closeIntro();
+  $("#scoring").css("display", "flex");
   openFlash();
+  loadVideo();
 }
 
 function importScores() {
@@ -285,13 +273,14 @@ function importScores() {
       }, {});
       generateTimeTicks(importData);
       createChart(importData);
+      loadVideo();
     })
     .catch((error) => {
       console.error("Error:", error);
     });
 }
 
-// pulls id from youtube link 
+// pulls id from youtube link
 function chopLink(link) {
   for (var i = 0; i < link.length; i++) {
     if (link.charAt(i) == "v" && link.charAt(i + 1) == "=") {
@@ -374,8 +363,7 @@ function appendClicks() {
     body: JSON.stringify({ dataArray: formattedExport }),
   })
     .then((response) => response.json())
-    .then((data) => 
-      {
+    .then((data) => {
       importScores();
       return data;
     })
@@ -384,20 +372,17 @@ function appendClicks() {
     });
 }
 
-
 // function to select judge and pull their data from the list of judges that scored the routine
 function selectJudge() {
   const judgeSplitAsArray = Object.values(importData);
-  if ( chartSelection == null ) {
+  if (chartSelection == null) {
     judgeSelect = $("#judge-pick");
     if ($("#judge-pick").children("option").length > 1) {
       selectedIndex = judgeSelect[0].selectedIndex;
-    }
-    else {
+    } else {
       selectedIndex = judgeSplitAsArray.length - 1;
     }
-  }
-  else {
+  } else {
     selectedIndex = chartSelection;
     $("#judge-pick").val(judgeNames[selectedIndex]);
   }
@@ -406,9 +391,10 @@ function selectJudge() {
   checkCurrentTime(player.getCurrentTime());
 }
 
-// creates dropdown list of other judges to select from 
+// creates dropdown list of other judges to select from
 function createDropdown(options) {
-  document.getElementById("judge-select").innerHTML = "<select id='judge-pick'></select>";
+  document.getElementById("judge-select").innerHTML =
+    "<select id='judge-pick'></select>";
   judgeSelect = $("#judge-pick");
   $("#judge-pick").empty();
   judgeNames = Object.keys(options);
@@ -420,11 +406,11 @@ function createDropdown(options) {
 
 // function that calls drawchart
 function createChart(options) {
-  google.charts.load('current', {packages: ['corechart', 'line']});
+  google.charts.load("current", { packages: ["corechart", "line"] });
   google.charts.setOnLoadCallback(drawChart(options));
 }
 
-// draws chart of scores 
+// draws chart of scores
 function drawChart(scores) {
   const scoreMap = {};
   for (const key in scores) {
@@ -436,8 +422,9 @@ function drawChart(scores) {
       scoreMap[second][Object.keys(scores).indexOf(key)] = score;
     });
   }
-  var resultArray = Object.entries(scoreMap).map(([second, scores]) => {
-    const row = [parseInt(second, 10)];
+  resultArray = Object.entries(scoreMap).map(([second, scores]) => {
+    // const row = [parseInt(second, 10)];
+    const row = [Number(second)];
     scores.forEach((score) => row.push(score));
     return row;
   });
@@ -462,134 +449,165 @@ function drawChart(scores) {
   const keys = Object.keys(scores);
   const firstLine = ["Seconds", ...keys];
   resultArray.unshift(firstLine);
-
-    for (let index = 0; index < resultArray.length; index++) {
+  for (let index = 0; index < resultArray.length; index++) {
     const subArray = resultArray[index];
-    
+
     if (index === 0) {
-        const newHeader = [];
-        for (let i = 0; i < subArray.length; i++) {
-            newHeader.push(subArray[i]);
-            if (i > 0) {
-                newHeader.push({role: 'tooltip', p: {html: true}});
-            }
+      const newHeader = [];
+      for (let i = 0; i < subArray.length; i++) {
+        newHeader.push(subArray[i]);
+        if (i > 0) {
+          newHeader.push({ role: "tooltip", p: { html: true } });
         }
-        resultArray[index] = newHeader;
+      }
+      resultArray[index] = newHeader;
     } else {
-        const newRow = [];
-        for (let i = 0; i < subArray.length; i++) {
-            newRow.push(subArray[i]);
-            if (i > 0) {
-                var delta;
-                var symbol;
-                // var whileSearcher = index;
-                // while (subArray[i] == resultArray[whileSearcher - 1][(i*2)-1] && subArray[0] == resultArray[whileSearcher - 1][(i*2)-1]) {
-                //   whileSearcher -= 1;
-                // }
-                // delta = subArray[i] - resultArray[whileSearcher-1][(i*2)-1]
-                // if (delta >= 0) {
-                //   symbol = "+"
-                // }
-                // else {
-                //   symbol = ""
-                // }
-                newRow.push("<div>" + resultArray[0][(i*2)-1] + "</div>" + "<div>" + convertIntegerToTime(subArray[0]) + "</div>");
-            }
+      const newRow = [];
+      for (let i = 0; i < subArray.length; i++) {
+        newRow.push(subArray[i]);
+        if (i > 0) {
+          var delta;
+          var symbol;
+          var whileSearcher = index;
+          while (
+            subArray[i] == resultArray[whileSearcher - 1][i * 2 - 1] &&
+            subArray[0] == resultArray[whileSearcher - 1][i * 2 - 1]
+          ) {
+            whileSearcher -= 1;
+          }
+          if (index > 1) {
+            delta = subArray[i] - resultArray[index - 2][i * 2 - 1];
+          } else {
+            delta = 0;
+          }
+          if (delta >= 0) {
+            symbol = "+";
+          } else {
+            symbol = "";
+          }
+          var deltaValue = symbol + delta;
+          newRow.push(
+            "<div>" +
+              resultArray[0][i * 2 - 1] +
+              "</div>" +
+              "<div>" +
+              deltaValue +
+              " " +
+              convertIntegerToTime(subArray[0]) +
+              "</div>"
+          );
         }
-        resultArray[index] = newRow;
+      }
+      resultArray[index] = newRow;
     }
-}
+  }
 
-
-var data = google.visualization.arrayToDataTable(resultArray);
-  
-var options = {
-  title: "Scores Over Time",
-  backgroundColor: "#414141",
-  colors: ["#5bebaf", "#23f7e2", "#adefff"],
-  curveType: "function",
-  fontName: "Courier",
-  legend: {
+  data = google.visualization.arrayToDataTable(resultArray);
+  chartOptions = {
+    title: "Scores Over Time",
+    backgroundColor: "#414141",
+    colors: [
+      "#FF0000",
+      "#00FF00",
+      "#0000FF",
+      "#FFFF00",
+      "#00FFFF",
+      "#FF00FF",
+      "#FFA500",
+      "#800080",
+      "#008080",
+      "#FF7F50",
+    ],
+    curveType: "none",
+    fontName: "Courier",
+    legend: {
       position: "top",
       textStyle: {
-          color: "#5bebaf",
+        color: "#5bebaf",
       },
-  },
-  hAxis: {
+    },
+    hAxis: {
       title: "Time",
       ticks: ticks,
-      ticks: ticks,
       titleTextStyle: {
-          color: "#5bebaf",
+        color: "#5bebaf",
       },
       textStyle: {
-          color: "#5bebaf",
+        color: "#5bebaf",
       },
       gridlines: { count: 5 },
-  },
-  vAxis: {
+    },
+    vAxis: {
       title: "Score",
       titleTextStyle: {
-          color: "#5bebaf",
+        color: "#5bebaf",
       },
       textStyle: {
-          color: "#5bebaf",
+        color: "#5bebaf",
       },
       gridlines: { count: 5 },
-  },
-  tooltip: { isHtml: true, trigger: 'hover' }
-};
+    },
+    tooltip: { isHtml: true, trigger: "selection", enabled: true },
+  };
 
-  var chart = new google.visualization.LineChart(
-    document.getElementById("chart")
-  );
+  chart = new google.visualization.LineChart(document.getElementById("chart"));
 
-  chart.draw(data, options);
+  chart.draw(data, chartOptions);
 
   // dont show chart till import done
 
-  google.visualization.events.addListener(chart, 'onmouseover', function(e) {
+  google.visualization.events.addListener(chart, "onmouseover", function (e) {
     return false;
-});
+  });
 
-google.visualization.events.addListener(chart, "select", function () {
-  var selection = chart.getSelection();
-  if (selection.length > 0) {
+  google.visualization.events.addListener(chart, "hover", function (e) {
+    return false;
+  });
+
+  google.visualization.events.addListener(chart, "select", function () {
+    var selection = chart.getSelection();
     var point = selection[0];
-    var xValue = data.getValue(point.row, 0);
-    videoSeek(xValue);
-  }
-})
+    if (selection.length > 0) {
+      var xValue = data.getValue(point.row, 0);
+      chartSelection = (selection[0].column + 1) / 2 - 1;
+      selectJudge();
+      videoSeek(xValue);
+    }
+  });
 }
 
 function convertIntegerToTime(number) {
   var minutesPart = Math.floor(number / 60);
   var secondsPart = Math.floor(number % 60);
-  var formattedTime = minutesPart + ':' + (secondsPart < 10 ? '0' : '') + secondsPart;
+  var formattedTime =
+    minutesPart + ":" + (secondsPart < 10 ? "0" : "") + secondsPart;
   return formattedTime;
 }
-
 
 function generateTimeTicks(lists) {
   var minSecond = Infinity;
   var maxSecond = -Infinity;
   for (const key in lists) {
     if (lists.hasOwnProperty(key)) {
-        const dataList = lists[key];
-        dataList.forEach(item => {
-            const secondValue = item.second;
-            if (secondValue < minSecond) {
-                minSecond = secondValue;
-            }
-            if (secondValue > maxSecond) {
-                maxSecond = secondValue;
-            }
-        });
+      const dataList = lists[key];
+      dataList.forEach((item) => {
+        const secondValue = Math.floor(item.second);
+        if (secondValue < minSecond) {
+          minSecond = secondValue;
+        }
+        if (secondValue > maxSecond) {
+          maxSecond = secondValue;
+        }
+      });
     }
-}
+  }
 
-  for (var totalSeconds = minSecond; totalSeconds <= maxSecond; totalSeconds += 15) {
-      ticks.push({ v: totalSeconds, f: convertIntegerToTime(totalSeconds) });
+  for (
+    var totalSeconds = minSecond;
+    totalSeconds <= maxSecond;
+    totalSeconds += 15
+  ) {
+    ticks.push({ v: totalSeconds, f: convertIntegerToTime(totalSeconds) });
   }
 }
 
@@ -612,24 +630,29 @@ function loadVideo() {
   }
 }
 
-// loads video into youtube player 
+// loads video into youtube player
 function onYouTubeIframeAPIReady() {
   youtubeLink = chopLink(youtubeLink);
   player = new YT.Player("player", {
-    width: 1280,
-    height: 720,
+    // 1280 720 is default
+    width: 900,
+    height: 600,
     videoId: youtubeLink,
     events: {
       onReady: onPlayerReady,
       onStateChange: onPlayerStateChange,
     },
   });
+  $("#positive-display").text("+0");
+  $("#negative-display").text("-0");
 }
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
   event.target.pauseVideo();
-  checkInterval = setInterval(seekIndicator, 1000); 
+  if (isReplayMode) {
+    checkInterval = setInterval(seekIndicator, 1000);
+  }
 }
 
 // scrolls through list of scores to retrieve the click value at a specific time
@@ -638,19 +661,21 @@ function getScoreAtSecond(time) {
   positiveScore = 0;
   negativeScore = 0;
   while (replayData[i].second < time) {
-    if (i > 0) { 
+    if (i > 0) {
       var previousScore = replayData[i - 1].score;
       var currentScore = replayData[i].score;
       if (currentScore > previousScore) {
-          positiveScore += currentScore - previousScore;
+        positiveScore += currentScore - previousScore;
       } else if (currentScore < previousScore) {
-          negativeScore += previousScore - currentScore;
+        negativeScore += previousScore - currentScore;
       }
-  }
+    }
     i++;
   }
-  var displayText = "+" + positiveScore + " " + "-" + negativeScore;
-  $("#click-display").text(displayText);
+  var positiveText = "+" + positiveScore;
+  var negativeText = "-" + negativeScore;
+  $("#positive-display").text(positiveText);
+  $("#negative-display").text(negativeText);
   replayDataIndex = i;
 }
 
@@ -659,38 +684,45 @@ function checkCurrentTime(time) {
   seekMarker = player.getCurrentTime();
 }
 
-// calls view timer function if the user wants to view scores 
+// calls view timer function if the user wants to view scores
+// may need to re-assess/condense
 function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
+  if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
+    wasPaused = false;
+    $("#otherContent").focus();
+    $(document).on("keydown", handleKeydown);
+  } else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
     wasPaused = false;
     selectJudge();
     seekMarker = player.getCurrentTime();
     // identify what this is for
     // maybe move this outside of if else since it should always check? but only for replay mode tho
     // replayInterval = setInterval(checkCurrentTime, 10);
+    isPaused = false;
     replayTimer();
   } else if (event.data == YT.PlayerState.PAUSED) {
+    $(document).off("keydown", handleKeydown);
     wasPaused = true;
     pauseTimer();
   } else if (event.data == YT.PlayerState.CUED) {
     wasPaused = true;
-  } 
-  else if (isReplayMode) {
-
   }
+}
 
+function handleKeydown(e) {
+  e.preventDefault();
 }
 
 function seekIndicator() {
   if (wasPaused) {
     var currentTime = player.getCurrentTime();
-    if (Math.abs(currentTime - seekMarker) > 1) { 
+    if (Math.abs(currentTime - seekMarker) > 1) {
       checkCurrentTime(player.getCurrentTime());
       return true;
     }
     seekMarker = currentTime;
   } else {
-    seekMarker = player.getCurrentTime(); 
+    seekMarker = player.getCurrentTime();
   }
 }
 
@@ -755,15 +787,21 @@ function configureLiveReplay() {
         positiveScore = positiveScore + 2;
       }
     }
+    // displayData.push([
+    //   replayData[i].second,
+    //   "+" + String(positiveScore) + " " + "-" + String(negativeScore),
+    // ]);
     displayData.push([
       replayData[i].second,
-      "+" + String(positiveScore) + " " + "-" + String(negativeScore),
+      "+" + String(positiveScore),
+      "-" + String(negativeScore),
     ]);
   }
   dataAnalysis();
   return displayData;
 }
 
+// stop on video pause?
 function viewAdd(list) {
   //this is breaking at end, maybe due to player
   viewSeconds = Number(player.getCurrentTime().toFixed(1));
@@ -772,18 +810,24 @@ function viewAdd(list) {
       if (list[replayDataIndex].score == 1) {
         positiveScore = 1;
         negativeScore = 0;
+        $("#positive-display").text(displayData[replayDataIndex][1]);
+        clickerEffect("+");
         if (isFlash) {
           changeColors("pos");
         }
       } else if (list[replayDataIndex].score == 2) {
         positiveScore = 2;
         negativeScore = 0;
+        $("#positive-display").text(displayData[replayDataIndex][1]);
+        clickerEffect("+");
         if (isFlash) {
           changeColors("dub");
         }
       } else if (list[replayDataIndex].score == -1) {
         positiveScore = 0;
         negativeScore = 1;
+        $("#negative-display").text(displayData[replayDataIndex][2]);
+        clickerEffect("-");
         if (isFlash) {
           changeColors("neg");
         }
@@ -791,6 +835,8 @@ function viewAdd(list) {
     } else {
       if (list[replayDataIndex].score == list[replayDataIndex - 1].score + 1) {
         positiveScore++;
+        $("#positive-display").text(displayData[replayDataIndex][1]);
+        clickerEffect("+");
         if (isFlash) {
           changeColors("pos");
         }
@@ -799,24 +845,29 @@ function viewAdd(list) {
         list[replayDataIndex - 1].score - 1
       ) {
         negativeScore++;
+        $("#negative-display").text(displayData[replayDataIndex][2]);
+        clickerEffect("-");
         if (isFlash) {
           changeColors("neg");
-        } 
+        }
       } else if (
         list[replayDataIndex].score ==
         list[replayDataIndex - 1].score + 2
       ) {
         positiveScore = positiveScore + 2;
+        $("#positive-display").text(displayData[replayDataIndex][1]);
+        clickerEffect("+");
         if (isFlash) {
           changeColors("dub");
         }
       }
     }
-    $("#click-display").text(displayData[replayDataIndex][1]);
+    setChartPoint(
+      replayData[replayDataIndex].second,
+      replayData[replayDataIndex].score
+    );
     replayDataIndex += 1;
-  }
-  else {
-    // can prob put in function
+  } else {
     var i = 0;
     while (list[i].second < viewSeconds) {
       i++;
@@ -826,19 +877,55 @@ function viewAdd(list) {
   replayTimer();
 }
 
+// sometimes it resets while clicking ?
+
+// works but need to figure out the delta situation and potentially creating function to hide it or switch while playing
+function setChartPoint(second, score) {
+  var chartIndex;
+  for (var i = 0; i < resultArray.length; i++) {
+    var row = resultArray[i];
+    if (row[0] === second && row[selectedIndex * 2 + 1] === score) {
+      chartIndex = i;
+      break;
+    }
+  }
+  if (
+    resultArray[chartIndex][selectedIndex * 2 + 1] ==
+    resultArray[chartIndex - 1][selectedIndex * 2 + 1]
+  ) {
+    return false;
+  }
+  if (chartIndex > 0 != false) {
+    chart.setSelection([{ row: chartIndex, column: selectedIndex * 2 + 1 }]);
+  }
+}
+
+function clickerEffect(delta) {
+  if (delta == "+") {
+    $("#positive-display").addClass("updating");
+    setTimeout(() => {
+      $("#positive-display").removeClass("updating");
+    }, 100);
+  } else {
+    $("#negative-display").addClass("updating");
+    setTimeout(() => {
+      $("#negative-display").removeClass("updating");
+    }, 100);
+  }
+}
+
 // function to pause the timer
 function pauseTimer() {
   clearTimeout(replayTimeout);
-  isPaused = true;
+  wasPaused = true;
 }
 
 // timeout function that starts the scan of youtube video time along with the score data
 function replayTimer() {
-  isPaused = false;
-  if (isReplayMode) {
+  if (isReplayMode && wasPaused == false) {
     replayTimeout = setTimeout(function () {
       viewAdd(replayData);
-    }, 1);
+    }, 200);
   }
 }
 
@@ -863,23 +950,29 @@ function dataAnalysis() {
   var sequenceIndexEnd;
   var i;
   var j;
-  for (i=0; i < replayData.length; i++) {
+  for (i = 0; i < replayData.length; i++) {
     j = i;
     var sequenceScore = 0;
-    while ( (replayData[j].second <= replayData[i].second + 10) && (j < replayData.length - 1) ) {
-      sequenceScore += (replayData[j+1].score - replayData[j].score);
+    while (
+      replayData[j].second <= replayData[i].second + 10 &&
+      j < replayData.length - 1
+    ) {
+      sequenceScore += replayData[j + 1].score - replayData[j].score;
       if (sequenceScore > maxSequenceScore) {
         sequenceIndexStart = i;
         sequenceIndexEnd = j;
         maxSequenceScore = sequenceScore;
         maxSequenceTime = replayData[i].second;
-
       }
-      j++; 
+      j++;
     }
   }
-  console.log("Max Sequence", maxSequenceScore, maxSequenceTime, replayData[j].second, displayData[sequenceIndexStart][1], displayData[sequenceIndexEnd][1]);
-
-
+  console.log(
+    "Max Sequence",
+    maxSequenceScore,
+    maxSequenceTime,
+    replayData[j].second,
+    displayData[sequenceIndexStart][1],
+    displayData[sequenceIndexEnd][1]
+  );
 }
-

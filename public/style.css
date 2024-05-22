@@ -1,6 +1,6 @@
 body {
   color: #5bebaf;
-  background-color: #383838;
+  background-color: #242424;
   margin: 0 auto;
   padding: 0;
   align-items: center;
@@ -20,6 +20,78 @@ body {
 
 #intro {
   display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#intro h1 {
+  font-size: 50px;
+} 
+
+#intro h3 {
+  font-weight: 100;
+  font-size: 25px;
+}
+
+#intro label {
+  margin-top: 15px;
+  font-size: 15px;
+}
+
+#intro input {
+  width: 250px;
+  height: 25px;
+  font-size: 10px;
+}
+
+#intro button {
+  font-size: 10px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+#main {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 10px; 
+  width: 100%;
+}
+
+#main h1 {
+  margin: 5px
+}
+
+#main #initial-input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#main label {
+  display: block; 
+  margin-bottom: 5px;
+}
+
+#main input {
+  width: 250px; 
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+#main #buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: 10px;
+  transform: translate(-50%, 50%);
 }
 
 h1,
@@ -43,15 +115,13 @@ select {
   font-size: 20px !important;
   color: #5bebaf !important;
   background-color: #383838 !important;
-  padding: 10px 10px 0px 10px !important;
+  padding: 10px 5px 0px 5px !important;
   margin: 0 auto !important;
   display: block !important;
   text-align: center !important;
+  opacity: .8 !important;
 }
 
-h1, h3 {
-  margin: 0 auto !important;
-}
 
 li {
   font-family: Courier, monospace;
@@ -126,7 +196,6 @@ input[type="text"] {
   align-items: center;
   justify-content: center;
   display: flex;
-  /* margin: 0 auto; */
   margin: 10px;
 }
 
@@ -140,8 +209,8 @@ button:hover {
 }
 
 #video {
-  padding: 50px;
   border: 3px #5bebaf;
+  width: 50%;
 }
 
 #buttons {
@@ -189,30 +258,38 @@ button:hover {
   width: min-content;
 }
 
-#query-link {
-  width: max-content;
-}
-
-.instructions-btn {
-  margin: 0 auto;
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
 #chart {
-  margin-top: 50px;
-  width: 1280px;
-  height: 720px;
+  width: 900px;
+  height: 600px;
 }
 
 #click-display {
-  padding: 35px;
   font-size: 35px;
+  display: flex;
+  width: 30%;
+  text-align: center;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+#positive-display {
+  font-size: 35px;
+  margin: 15px; 
+}
+
+#negative-display {
+  font-size: 35px;
+  margin: 15px; 
+}
+
+.updating {
+  transform: scale(1.1);
 }
 
 #post-data {
   padding: 20px;
   font-size: 20px;
+  width: 50%;
 }
 
 #flash-prompt {
@@ -225,9 +302,25 @@ button:hover {
 
 #scoring {
   display: none;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 220px;
 }
 
 #judge-select {
   display: none;
+  position: absolute;
+  top: 140px;
 }
 
+#video-post-container {
+  display: flex;
+}
+
+#video,
+#post-data {
+    flex: 1; 
+    padding: 10px; 
+    box-sizing: border-box;
+}

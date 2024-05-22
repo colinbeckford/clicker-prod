@@ -1,26 +1,48 @@
 <html>
-
-<head>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
-        </script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type = "text/javascript">
-      google.charts.load('current', {packages: ['corechart','line']});  
-   </script>
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script type="text/javascript">
+      google.charts.load("current", { packages: ["corechart", "line"] });
+    </script>
     <script src="clicker.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
+  <body>
     <div id="container">
       <div id="intro">
         <h1>Scales Clicker</h1>
-        <h3> an analytical yo-yo freestyle scoring tool </h3>
-        <button class="instructions-btn" onclick="openHowto()"> Instructions </button>
+        <h3>an analytical yo-yo freestyle scoring tool</h3>
         <div id="initial-input">
           <div>
-            <label for="yt-link">Youtube Link</label>
+            <label for="yt-link">Freestyle Link</label>
+            <input type="text" id="yt-link" name="yt-link" />
+          </div>
+        </div>
+        <div id="buttons">
+          <div>
+            <button id="submit" onclick="loadData(false)">Score Video</button>
+          </div>
+          <div>
+            <button id="view-scores" onclick="loadData(true)">
+              Show Scores for Video
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="main">
+        <h1>Scales Clicker</h1>
+        <div id="initial-input">
+          <div>
+            <label for="yt-link">Freestyle Link</label>
             <input type="text" id="yt-link" name="yt-link" />
           </div>
         </div>
@@ -39,14 +61,19 @@
         <select id="judge-pick"></select>
       </div>
       <div id="scoring">
-        <h1 id="click-display"></h1>
-        <div id="video"></div>
+        <div id="click-display">
+          <h2 id="positive-display"></h2>
+          <h2 id="negative-display"></h2>
+        </div>
+        <div id="video-post-container">
+          <!-- remove post-data -->
+          <div id="video"></div>
+          <div id="otherContent" tabindex="-1"></div>
+          <div id="post-data">
+              <div id="chart"></div>
+          </div>
       </div>
-      <div id="post-data">
-        <text id="query-link"></text>
-        <div id="chart"></div>
       </div>
-
       <div class="popup" id="flash-prompt">
         <p>Flash video border during clicks?</p>
         <div class="btn-container">
@@ -60,23 +87,23 @@
           <input type="text" id="judge-name" name="judge-name" />
         </div>
         <div id="keybinds">
-        <div>
-          <label for="positive-key">+1</label>
-          <input id="positive-key" value="k" size="1" />
+          <div>
+            <label for="positive-key">+1</label>
+            <input id="positive-key" value="k" size="1" />
+          </div>
+          <div>
+            <label for="negative-key">-1</label>
+            <input id="negative-key" value="j" size="1" />
+          </div>
+          <div>
+            <label for="double-key">+2</label>
+            <input id="double-key" value="2" size="1" />
+          </div>
+          <div>
+            <label for="submit-key">Submit</label>
+            <input id="submit-key" value="0" size="1" />
+          </div>
         </div>
-        <div>
-          <label for="negative-key">-1</label>
-          <input id="negative-key" value="j" size="1" />
-        </div>
-        <div>
-          <label for="double-key">+2</label>
-          <input id="double-key" value="2" size="1" />
-        </div>
-        <div>
-          <label for="submit-key">Submit</label>
-          <input id="submit-key" value="0" size="1" />
-        </div>
-      </div>
         <div class="btn-container">
           <button class="btn btn-yes" onclick="closeInputs()">Save</button>
         </div>
@@ -88,21 +115,6 @@
           <button class="btn btn-no" onclick="closeSave(false)">No</button>
         </div>
       </div>
-      <div class="popup" id="instructions">
-        <h3> Steps to Use </h3>
-        <ol>
-          <li>Enter your name in the Judge Name input and provide a YouTube link for the freestyle.</li>
-          <li>Choose between scoring the video or viewing other judges' scores by clicking "Score Video" or "Show Scores for Video."</li>
-          <li>Optionally, decide if you want the video border to flash by responding to the popup.</li>
-          <li>If you're the one scoring, customize keybinds for click values in the panel that appears.</li>
-          <li>When viewing a routine with existing scores, use the dropdown to select the judge whose scores you want to see.</li>
-          <li>Play the video and either score it independently or watch another judge's scores.</li>
-        </ol>
-        <div class="btn-container">
-          <button class="btn btn-yes" onclick="closeHowto()">Close</button>
-        </div>
-      </div>
     </div>
   </body>
-
 </html>
