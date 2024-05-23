@@ -169,7 +169,6 @@ function closeFlash(response) {
   setTimeout(() => {
     loadVideo();
   }, 500);
-  
 }
 
 // opens save popup
@@ -224,7 +223,7 @@ function closeInputs() {
     openSelect();
     createDropdown(importData);
   }
-  
+
   loadVideo();
 }
 
@@ -472,11 +471,9 @@ function drawChart(scores) {
           if (index > 1) {
             if (keys.length > 1) {
               delta = subArray[i] - resultArray[index - 2][i * 2 - 1];
-            }
-            else {
+            } else {
               delta = subArray[i] - resultArray[index - 1][i * 2 - 1];
             }
-            
           } else {
             delta = 0;
           }
@@ -618,7 +615,10 @@ function videoSeek(time) {
 
 // creates video player
 function loadVideo() {
-  if (!playerExists() && (isReplayMode == false || JSON.stringify(importData) !== "{}")) {
+  if (
+    !playerExists() &&
+    (isReplayMode == false || JSON.stringify(importData) !== "{}")
+  ) {
     $("#video").html("<div id='player'></div>");
     var tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
@@ -637,6 +637,7 @@ function setViewingMode(type) {
 
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
+  // ADJUST TO MAKE VIDEO FULL SIZED IF NOT REPLAY MODE
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
     player = new YT.Player("player", {
       // 1280 720 is default
@@ -666,14 +667,16 @@ function getScoreAtSecond(time) {
   var i = 0;
   positiveScore = 0;
   negativeScore = 0;
-  while (replayData[i].second < time) {
+  while (i < replayData.length && replayData[i].second < time) {
     if (i > 0) {
-      var previousScore = replayData[i - 1].score;
-      var currentScore = replayData[i].score;
-      if (currentScore > previousScore) {
-        positiveScore += currentScore - previousScore;
-      } else if (currentScore < previousScore) {
-        negativeScore += previousScore - currentScore;
+      if (i < replayData.length) { 
+        var previousScore = replayData[i - 1].score;
+        var currentScore = replayData[i].score;
+        if (currentScore > previousScore) {
+          positiveScore += currentScore - previousScore;
+        } else if (currentScore < previousScore) {
+          negativeScore += previousScore - currentScore;
+        }
       }
     }
     i++;
@@ -800,80 +803,83 @@ function configureLiveReplay() {
   return displayData;
 }
 
-// stop on video pause?
 function viewAdd(list) {
-  //this is breaking at end, maybe due to player
   viewSeconds = Number(player.getCurrentTime().toFixed(1));
-  if (Math.abs(viewSeconds - list[replayDataIndex].second) <= 0.25) {
-    if (replayDataIndex == 0) {
-      if (list[replayDataIndex].score == 1) {
-        positiveScore = 1;
-        negativeScore = 0;
-        $("#positive-display").text(displayData[replayDataIndex][1]);
-        clickerEffect("+");
-        if (isFlash) {
-          changeColors("pos");
+  if (replayDataIndex < list.length) {
+    if (Math.abs(viewSeconds - list[replayDataIndex].second) <= 0.25) {
+      if (replayDataIndex == 0) {
+        if (list[replayDataIndex].score == 1) {
+          positiveScore = 1;
+          negativeScore = 0;
+          $("#positive-display").text(displayData[replayDataIndex][1]);
+          clickerEffect("+");
+          if (isFlash) {
+            changeColors("pos");
+          }
+        } else if (list[replayDataIndex].score == 2) {
+          positiveScore = 2;
+          negativeScore = 0;
+          $("#positive-display").text(displayData[replayDataIndex][1]);
+          clickerEffect("+");
+          if (isFlash) {
+            changeColors("dub");
+          }
+        } else if (list[replayDataIndex].score == -1) {
+          positiveScore = 0;
+          negativeScore = 1;
+          $("#negative-display").text(displayData[replayDataIndex][2]);
+          clickerEffect("-");
+          if (isFlash) {
+            changeColors("neg");
+          }
         }
-      } else if (list[replayDataIndex].score == 2) {
-        positiveScore = 2;
-        negativeScore = 0;
-        $("#positive-display").text(displayData[replayDataIndex][1]);
-        clickerEffect("+");
-        if (isFlash) {
-          changeColors("dub");
-        }
-      } else if (list[replayDataIndex].score == -1) {
-        positiveScore = 0;
-        negativeScore = 1;
-        $("#negative-display").text(displayData[replayDataIndex][2]);
-        clickerEffect("-");
-        if (isFlash) {
-          changeColors("neg");
+      } else {
+        if (
+          list[replayDataIndex].score ==
+          list[replayDataIndex - 1].score + 1
+        ) {
+          positiveScore++;
+          $("#positive-display").text(displayData[replayDataIndex][1]);
+          clickerEffect("+");
+          if (isFlash) {
+            changeColors("pos");
+          }
+        } else if (
+          list[replayDataIndex].score ==
+          list[replayDataIndex - 1].score - 1
+        ) {
+          negativeScore++;
+          $("#negative-display").text(displayData[replayDataIndex][2]);
+          clickerEffect("-");
+          if (isFlash) {
+            changeColors("neg");
+          }
+        } else if (
+          list[replayDataIndex].score ==
+          list[replayDataIndex - 1].score + 2
+        ) {
+          positiveScore = positiveScore + 2;
+          $("#positive-display").text(displayData[replayDataIndex][1]);
+          clickerEffect("+");
+          if (isFlash) {
+            changeColors("dub");
+          }
         }
       }
+      setChartPoint(
+        replayData[replayDataIndex].second,
+        replayData[replayDataIndex].score
+      );
+      replayDataIndex += 1;
     } else {
-      if (list[replayDataIndex].score == list[replayDataIndex - 1].score + 1) {
-        positiveScore++;
-        $("#positive-display").text(displayData[replayDataIndex][1]);
-        clickerEffect("+");
-        if (isFlash) {
-          changeColors("pos");
-        }
-      } else if (
-        list[replayDataIndex].score ==
-        list[replayDataIndex - 1].score - 1
-      ) {
-        negativeScore++;
-        $("#negative-display").text(displayData[replayDataIndex][2]);
-        clickerEffect("-");
-        if (isFlash) {
-          changeColors("neg");
-        }
-      } else if (
-        list[replayDataIndex].score ==
-        list[replayDataIndex - 1].score + 2
-      ) {
-        positiveScore = positiveScore + 2;
-        $("#positive-display").text(displayData[replayDataIndex][1]);
-        clickerEffect("+");
-        if (isFlash) {
-          changeColors("dub");
-        }
+      var i = 0;
+      while (list[i].second < viewSeconds) {
+        i++;
       }
+      replayDataIndex = i;
     }
-    setChartPoint(
-      replayData[replayDataIndex].second,
-      replayData[replayDataIndex].score
-    );
-    replayDataIndex += 1;
-  } else {
-    var i = 0;
-    while (list[i].second < viewSeconds) {
-      i++;
-    }
-    replayDataIndex = i;
+    replayTimer();
   }
-  replayTimer();
 }
 
 function setChartPoint(second, score) {
