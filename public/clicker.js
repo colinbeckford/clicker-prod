@@ -470,7 +470,13 @@ function drawChart(scores) {
             whileSearcher -= 1;
           }
           if (index > 1) {
-            delta = subArray[i] - resultArray[index - 2][i * 2 - 1];
+            if (keys.length > 1) {
+              delta = subArray[i] - resultArray[index - 2][i * 2 - 1];
+            }
+            else {
+              delta = subArray[i] - resultArray[index - 1][i * 2 - 1];
+            }
+            
           } else {
             delta = 0;
           }
@@ -512,7 +518,7 @@ function drawChart(scores) {
       "#008080",
       "#FF7F50",
     ],
-    curveType: "none",
+    curveType: "function",
     fontName: "Courier",
     legend: {
       position: "top",
