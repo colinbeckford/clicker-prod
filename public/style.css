@@ -318,13 +318,13 @@ button:hover {
 }
 
 #video {
-  padding: 15px;
+  margin: 15px;
   flex: 1;
   box-sizing: border-box;
 }
 
 #chart {
-  padding: 15px;
+  margin: 15px;
   width: 900px;
   height: 600px;
 }
