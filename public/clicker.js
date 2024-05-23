@@ -68,14 +68,19 @@ $(document).ready(function () {
   $("#submit-key").on("keydown", function (submit_e) {
     submitKey = submit_e.keyCode;
   });
-  // autofilling logic
-  if (myurl.searchParams.has("link")) {
-    youtubeLink = "https://youtu.be/" + myurl.searchParams.get("link");
-    $("#yt-link").val(youtubeLink);
-  } else if (myurl.searchParams.has("name")) {
-    $("#judge-name").val(myurl.searchParams.get("name"));
-  }
   $(document).on("change", "#judge-pick", handleSelectChange);
+});
+
+$(document).ready(function() {
+  $('#submit').click(function() {
+      youtubeLink = chopLink($('#yt-link').val()); 
+      console.log(youtubeLink);
+  });
+
+  $('#view-scores').click(function() {
+      youtubeLink = chopLink($('#yt-link').val()); 
+      console.log(youtubeLink);
+  });
 });
 
 function handleSelectChange() {
@@ -181,6 +186,7 @@ function openSave() {
   $("#save-prompt").show();
 }
 
+// REVISIT - NEED TO FIX VIDEO LOADING BEFORE CHART
 // opens post data
 function openPost() {
   $("#post-data").show();
@@ -190,17 +196,11 @@ function openPost() {
 function closeSave(response) {
   $("#save-prompt").hide();
   if (response) {
-    openPost();
+    // openPost();
     isReplayMode = true;
     formatList();
   } else {
-    location.assign(
-      "http://scalescollective.com/clicker/" +
-        "?link=" +
-        youtubeLink +
-        "&name=" +
-        judgeName
-    );
+
   }
 }
 
@@ -248,14 +248,13 @@ function playerExists() {
 }
 
 function loadData(replay) {
+  reset();
   isReplayMode = replay;
-  youtubeLink = chopLink($("#yt-link").val());
+  // youtubeLink = chopLink($("#yt-link").val());
   if (playerExists()) {
-    reset();
     player.cueVideoById(youtubeLink);
   }
   closeIntro();
-  $("#scoring").css("display", "flex");
   openFlash();
   loadVideo();
 }
@@ -628,11 +627,17 @@ function loadVideo() {
     var firstScriptTag = document.getElementsByTagName("script")[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
+  if (isReplayMode) {
+    $("#video-chart").css('display', 'flex');
+  }
+  else {
+    $("#video-chart").css('display', 'block');
+  }
 }
 
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
-  youtubeLink = chopLink(youtubeLink);
+  console.log("On iframe api ready");
   player = new YT.Player("player", {
     // 1280 720 is default
     width: 900,
@@ -649,6 +654,7 @@ function onYouTubeIframeAPIReady() {
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
+  console.log("On player ready");
   event.target.pauseVideo();
   if (isReplayMode) {
     checkInterval = setInterval(seekIndicator, 1000);

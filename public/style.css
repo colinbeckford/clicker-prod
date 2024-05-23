@@ -28,7 +28,7 @@ body {
 
 #intro h1 {
   font-size: 50px;
-} 
+}
 
 #intro h3 {
   font-weight: 100;
@@ -58,12 +58,12 @@ body {
   top: 0;
   left: 0;
   margin: 0;
-  padding: 10px; 
+  padding: 10px;
   width: 100%;
 }
 
 #main h1 {
-  margin: 5px
+  margin: 5px;
 }
 
 #main #initial-input {
@@ -76,12 +76,12 @@ body {
 }
 
 #main label {
-  display: block; 
+  display: block;
   margin-bottom: 5px;
 }
 
 #main input {
-  width: 250px; 
+  width: 250px;
   padding: 8px;
   margin-bottom: 10px;
 }
@@ -119,9 +119,8 @@ select {
   margin: 0 auto !important;
   display: block !important;
   text-align: center !important;
-  opacity: .8 !important;
+  opacity: 0.8 !important;
 }
-
 
 li {
   font-family: Courier, monospace;
@@ -131,11 +130,12 @@ a {
   font-family: Courier, monospace;
   color: #5bebaf;
   font-size: 20px;
-
 }
 
 button,
-input, select, option {
+input,
+select,
+option {
   background-color: #635f56;
   color: #5bebaf;
   font-family: Courier, monospace;
@@ -181,7 +181,8 @@ input[type="text"] {
   margin-bottom: 15px;
 }
 
-#judge-name, #yt-link {
+#judge-name,
+#yt-link {
   width: 200px;
   align-items: center;
   justify-content: center;
@@ -191,7 +192,10 @@ input[type="text"] {
   margin-bottom: 15px;
 }
 
-#positive-key, #negative-key, #double-key, #submit-key {
+#positive-key,
+#negative-key,
+#double-key,
+#submit-key {
   width: 50px;
   align-items: center;
   justify-content: center;
@@ -258,11 +262,6 @@ button:hover {
   width: min-content;
 }
 
-#chart {
-  width: 900px;
-  height: 600px;
-}
-
 #click-display {
   font-size: 35px;
   display: flex;
@@ -274,23 +273,23 @@ button:hover {
 
 #positive-display {
   font-size: 35px;
-  margin: 15px; 
+  margin: 15px;
 }
 
 #negative-display {
   font-size: 35px;
-  margin: 15px; 
+  margin: 15px;
 }
 
 .updating {
   transform: scale(1.1);
 }
 
-#post-data {
+/* #post-data {
   padding: 20px;
   font-size: 20px;
   width: 50%;
-}
+} */
 
 #flash-prompt {
   display: none;
@@ -314,13 +313,18 @@ button:hover {
   top: 140px;
 }
 
-#video-post-container {
-  display: flex;
+#video-chart {
+  display: block;
 }
 
-#video,
-#post-data {
-    flex: 1; 
-    padding: 10px; 
-    box-sizing: border-box;
+#video {
+  padding: 15px;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+#chart {
+  padding: 15px;
+  width: 900px;
+  height: 600px;
 }
