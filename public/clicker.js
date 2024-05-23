@@ -49,7 +49,7 @@ var chart;
 var chartOptions;
 var data;
 
-// css functions to hide components, assigning keys, and autofill name/link if applicable
+// css functions to hide components, assigning keys
 $(document).ready(function () {
   getJudges();
   getFreestyles();
@@ -69,18 +69,6 @@ $(document).ready(function () {
     submitKey = submit_e.keyCode;
   });
   $(document).on("change", "#judge-pick", handleSelectChange);
-});
-
-$(document).ready(function() {
-  $('#submit').click(function() {
-      youtubeLink = chopLink($('#yt-link').val()); 
-      console.log(youtubeLink);
-  });
-
-  $('#view-scores').click(function() {
-      youtubeLink = chopLink($('#yt-link').val()); 
-      console.log(youtubeLink);
-  });
 });
 
 function handleSelectChange() {
@@ -133,12 +121,13 @@ $("html").on("keydown", function (event) {
 });
 
 function reset() {
+  setViewingMode("block");
   positiveScore = 0;
   negativeScore = 0;
   judgeSelect = null;
   selectedIndex = 0;
   replayDataIndex = 0;
-  importData = [];
+  importData = {};
   replayData = [];
   displayData = [];
   initialExport = [];
@@ -148,8 +137,8 @@ function reset() {
   seekMarker = 0;
   document.getElementById("chart").innerHTML = "";
   document.getElementById("judge-select").innerHTML = "";
-  document.getElementById("positive-display").innerHTML = "";
-  document.getElementById("negative-display").innerHTML = "";
+  $("#positive-display").text("+0");
+  $("#negative-display").text("-0");
   clearInterval(replayInterval);
   chartSelection = null;
 }
@@ -176,9 +165,11 @@ function closeFlash(response) {
   if (isReplayMode) {
     importScores();
     openSelect();
-  } else {
-    openInputs();
   }
+  setTimeout(() => {
+    loadVideo();
+  }, 500);
+  
 }
 
 // opens save popup
@@ -186,21 +177,13 @@ function openSave() {
   $("#save-prompt").show();
 }
 
-// REVISIT - NEED TO FIX VIDEO LOADING BEFORE CHART
-// opens post data
-function openPost() {
-  $("#post-data").show();
-}
-
 // closes save popup
 function closeSave(response) {
   $("#save-prompt").hide();
   if (response) {
-    // openPost();
     isReplayMode = true;
     formatList();
   } else {
-
   }
 }
 
@@ -232,14 +215,17 @@ function openScoring() {
 
 // closes the inputs for judge name and keybinds
 function closeInputs() {
+  isFlash = $("#flash-border-toggle").prop("checked");
   judgeName = $("#judge-name").val();
   $("#inputs-popup").hide();
   openScoring();
-  setTimeout(function () {
-    if (isReplayMode) {
-      createDropdown(importData);
-    }
-  }, 1000);
+  if (isReplayMode) {
+    importScores();
+    openSelect();
+    createDropdown(importData);
+  }
+  
+  loadVideo();
 }
 
 // returns boolean if the youtube player has been initialized
@@ -250,13 +236,17 @@ function playerExists() {
 function loadData(replay) {
   reset();
   isReplayMode = replay;
-  // youtubeLink = chopLink($("#yt-link").val());
+  youtubeLink = chopLink($("#initial-yt-link").val());
   if (playerExists()) {
+    youtubeLink = chopLink($("#yt-link").val());
     player.cueVideoById(youtubeLink);
   }
   closeIntro();
-  openFlash();
-  loadVideo();
+  if (!isReplayMode) {
+    openInputs();
+  } else {
+    openFlash();
+  }
 }
 
 function importScores() {
@@ -270,9 +260,15 @@ function importScores() {
         acc[judge].push(rest);
         return acc;
       }, {});
-      generateTimeTicks(importData);
-      createChart(importData);
-      loadVideo();
+      if (JSON.stringify(importData) !== "{}") {
+        setViewingMode("flex");
+        generateTimeTicks(importData);
+        createChart(importData);
+      } else {
+        setViewingMode("block");
+        alert("This freestyle has not been scored by anyone.");
+        location.reload();
+      }
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -422,7 +418,6 @@ function drawChart(scores) {
     });
   }
   resultArray = Object.entries(scoreMap).map(([second, scores]) => {
-    // const row = [parseInt(second, 10)];
     const row = [Number(second)];
     scores.forEach((score) => row.push(score));
     return row;
@@ -553,8 +548,6 @@ function drawChart(scores) {
 
   chart.draw(data, chartOptions);
 
-  // dont show chart till import done
-
   google.visualization.events.addListener(chart, "onmouseover", function (e) {
     return false;
   });
@@ -613,48 +606,49 @@ function generateTimeTicks(lists) {
 // skips to specific second in youtube video and logs the clicker score at the time
 function videoSeek(time) {
   player.seekTo(time);
-  // maybe this breaks something? maybe only for isReplayMode?
   selectJudge();
   checkCurrentTime(time);
 }
 
 // creates video player
 function loadVideo() {
-  if (!playerExists()) {
+  if (!playerExists() && (isReplayMode == false || JSON.stringify(importData) !== "{}")) {
     $("#video").html("<div id='player'></div>");
     var tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName("script")[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
-  if (isReplayMode) {
-    $("#video-chart").css('display', 'flex');
-  }
-  else {
-    $("#video-chart").css('display', 'block');
+}
+
+function setViewingMode(type) {
+  if (type == "flex") {
+    $("#video-chart").css("display", "flex");
+  } else {
+    $("#video-chart").css("display", "block");
   }
 }
 
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
-  console.log("On iframe api ready");
-  player = new YT.Player("player", {
-    // 1280 720 is default
-    width: 900,
-    height: 600,
-    videoId: youtubeLink,
-    events: {
-      onReady: onPlayerReady,
-      onStateChange: onPlayerStateChange,
-    },
-  });
-  $("#positive-display").text("+0");
-  $("#negative-display").text("-0");
+  if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
+    player = new YT.Player("player", {
+      // 1280 720 is default
+      width: 900,
+      height: 600,
+      videoId: youtubeLink,
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+      },
+    });
+    $("#positive-display").text("+0");
+    $("#negative-display").text("-0");
+  }
 }
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
-  console.log("On player ready");
   event.target.pauseVideo();
   if (isReplayMode) {
     checkInterval = setInterval(seekIndicator, 1000);
@@ -691,7 +685,7 @@ function checkCurrentTime(time) {
 }
 
 // calls view timer function if the user wants to view scores
-// may need to re-assess/condense
+// may need to re-assess/condense - is/was paused
 function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
     wasPaused = false;
@@ -701,9 +695,6 @@ function onPlayerStateChange(event) {
     wasPaused = false;
     selectJudge();
     seekMarker = player.getCurrentTime();
-    // identify what this is for
-    // maybe move this outside of if else since it should always check? but only for replay mode tho
-    // replayInterval = setInterval(checkCurrentTime, 10);
     isPaused = false;
     replayTimer();
   } else if (event.data == YT.PlayerState.PAUSED) {
@@ -793,10 +784,6 @@ function configureLiveReplay() {
         positiveScore = positiveScore + 2;
       }
     }
-    // displayData.push([
-    //   replayData[i].second,
-    //   "+" + String(positiveScore) + " " + "-" + String(negativeScore),
-    // ]);
     displayData.push([
       replayData[i].second,
       "+" + String(positiveScore),
@@ -883,9 +870,6 @@ function viewAdd(list) {
   replayTimer();
 }
 
-// sometimes it resets while clicking ?
-
-// works but need to figure out the delta situation and potentially creating function to hide it or switch while playing
 function setChartPoint(second, score) {
   var chartIndex;
   for (var i = 0; i < resultArray.length; i++) {
@@ -945,7 +929,6 @@ function formatList() {
       initialExport[i][1],
     ]);
   }
-  // generateTimeTicks(Math.floor(formattedExport[0][2]), Math.ceil(formattedExport[formattedExport.length-1][2]));
   appendClicks();
 }
 

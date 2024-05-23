@@ -182,7 +182,7 @@ input[type="text"] {
 }
 
 #judge-name,
-#yt-link {
+#yt-link, #initial-yt-link {
   width: 200px;
   align-items: center;
   justify-content: center;
