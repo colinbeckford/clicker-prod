@@ -80,46 +80,48 @@ function handleSelectChange() {
 }
 // key click functions
 $("html").on("keydown", function (event) {
-  // negative click
-  if (event.which == negativeKey && player.getPlayerState() == 1) {
-    canSubmit = true;
-    negativeScore += 1;
-    raw = positiveScore - negativeScore;
-    seconds = Number(player.getCurrentTime().toFixed(1));
-    initialExport.push([seconds, raw]);
-    $("#negative-display").text("-" + String(negativeScore));
-    if (isFlash == true) {
-      changeColors("neg");
+  if (!isReplayMode) {
+    // negative click
+    if (event.which == negativeKey && player.getPlayerState() == 1) {
+      canSubmit = true;
+      negativeScore += 1;
+      raw = positiveScore - negativeScore;
+      seconds = Number(player.getCurrentTime().toFixed(1));
+      initialExport.push([seconds, raw]);
+      $("#negative-display").text("-" + String(negativeScore));
+      if (isFlash == true) {
+        changeColors("neg");
+      }
+      // positive click
+    } else if (event.which == positiveKey && player.getPlayerState() == 1) {
+      canSubmit = true;
+      positiveScore += 1;
+      raw = positiveScore - negativeScore;
+      seconds = Number(player.getCurrentTime().toFixed(1));
+      initialExport.push([seconds, raw]);
+      $("#positive-display").text("+" + String(positiveScore));
+      if (isFlash == true) {
+        changeColors("pos");
+      }
+      // double click
+    } else if (event.which == doubleKey && player.getPlayerState() == 1) {
+      canSubmit = true;
+      positiveScore += 2;
+      raw = positiveScore - negativeScore;
+      seconds = Number(player.getCurrentTime().toFixed(1));
+      initialExport.push([seconds, raw]);
+      $("#positive-display").text("+" + String(positiveScore));
+      if (isFlash == true) {
+        changeColors("dub");
+      }
+      // submit
+    } else if (event.which == submitKey && canSubmit == true) {
+      isReplayMode = false;
+      clearInterval(checkInterval);
+      player.stopVideo();
+      // timer to open save menu - could fix styling logic here
+      var confirmSave = setTimeout(openSave, 500);
     }
-    // positive click
-  } else if (event.which == positiveKey && player.getPlayerState() == 1) {
-    canSubmit = true;
-    positiveScore += 1;
-    raw = positiveScore - negativeScore;
-    seconds = Number(player.getCurrentTime().toFixed(1));
-    initialExport.push([seconds, raw]);
-    $("#positive-display").text("+" + String(positiveScore));
-    if (isFlash == true) {
-      changeColors("pos");
-    }
-    // double click
-  } else if (event.which == doubleKey && player.getPlayerState() == 1) {
-    canSubmit = true;
-    positiveScore += 2;
-    raw = positiveScore - negativeScore;
-    seconds = Number(player.getCurrentTime().toFixed(1));
-    initialExport.push([seconds, raw]);
-    $("#positive-display").text("+" + String(positiveScore));
-    if (isFlash == true) {
-      changeColors("dub");
-    }
-    // submit
-  } else if (event.which == submitKey && canSubmit == true) {
-    isReplayMode = false;
-    clearInterval(checkInterval);
-    player.stopVideo();
-    // timer to open save menu - could fix styling logic here
-    var confirmSave = setTimeout(openSave, 500);
   }
 });
 
@@ -138,18 +140,24 @@ function reset() {
   replayTimeout = null;
   viewSeconds = 0;
   seekMarker = 0;
-  document.getElementById("chart").innerHTML = "";
   document.getElementById("judge-select").innerHTML = "";
   $("#positive-display").text("+0");
   $("#negative-display").text("-0");
   clearInterval(replayInterval);
   chartSelection = null;
+  ticks = [];
+  if ($('#player').length) {
+    document.getElementById("player").innerHTML = "";
+  }
+
 }
 
 // hide intro css
 function closeIntro() {
   $("#intro").hide();
-  $("#main").show();
+  $("#main").css("display","flex");
+  // $("#main").show();
+  
 }
 
 // popup for flash option
@@ -488,13 +496,13 @@ function drawChart(scores) {
           var deltaValue = symbol + delta;
           newRow.push(
             "<div>" +
-              resultArray[0][i * 2 - 1] +
-              "</div>" +
-              "<div>" +
-              deltaValue +
-              " " +
-              convertIntegerToTime(subArray[0]) +
-              "</div>"
+            resultArray[0][i * 2 - 1] +
+            "</div>" +
+            "<div>" +
+            deltaValue +
+            " " +
+            convertIntegerToTime(subArray[0]) +
+            "</div>"
           );
         }
       }
@@ -505,6 +513,11 @@ function drawChart(scores) {
   data = google.visualization.arrayToDataTable(resultArray);
   chartOptions = {
     title: "Scores Over Time",
+    animation: {
+      startup: true,
+      duration: 1000,
+      easing: 'out'
+    },
     backgroundColor: "#414141",
     colors: [
       "#FF0000",
@@ -545,6 +558,7 @@ function drawChart(scores) {
       textStyle: {
         color: "#5bebaf",
       },
+      minValue: 0,
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
@@ -631,35 +645,43 @@ function loadVideo() {
 }
 
 function setViewingMode(type) {
-  console.log("Setting Viewing Mode", type);
+  $('#replay').css("display", "flex");
   if (type == true) {
-    $("#video-chart").css("display", "flex");
-    // $("#chart").css("width", "45%");
-    // $("#video").css("width", "45%");
+    if (playerExists()) {
+      $('#video').css("width", pageWidth * .45);
+      $('#video').css("height", pageHeight * .7);
+      $('#player').css("width", pageWidth);
+      $('#player').css("height", pageHeight * .7);
+    }
+    $('#replay').append('<div id="chart"></div>');
   } else {
-    $("#video-chart").css("display", "block");
-    // $("#chart").css("width", "0%");
-    // $("#chart").css("height", "0%");
-    // $("#video").css("width", "90%");
+    if (playerExists()) {
+      $('#video').css("width", pageWidth * .85);
+      $('#video').css("height", pageHeight * .7);
+      $('#player').css("width", pageWidth * .85);
+      $('#player').css("height", pageHeight * .7);
+    }
+    $('#chart').remove();
   }
 }
 
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
-      player = new YT.Player("player", {
-        width: pageWidth * .45,
-        height: pageHeight * .7,
-        videoId: youtubeLink,
-        events: {
-          onReady: onPlayerReady,
-          onStateChange: onPlayerStateChange,
-        },
-      });
-    }
-    $("#positive-display").text("+0");
-    $("#negative-display").text("-0");
+    // add if for diff modes like above
+    player = new YT.Player("player", {
+      width: pageWidth * .45,
+      height: pageHeight * .7,
+      videoId: youtubeLink,
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+      },
+    });
   }
+  $("#positive-display").text("+0");
+  $("#negative-display").text("-0");
+}
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
@@ -705,6 +727,7 @@ function checkCurrentTime(time) {
 function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
     wasPaused = false;
+    // need to reimplement this for key inputs interacting with video
     $("#otherContent").focus();
     $(document).on("keydown", handleKeydown);
   } else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
