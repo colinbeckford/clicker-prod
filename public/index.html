@@ -1,5 +1,9 @@
+<!-- head code -->
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> Scales Clicker </title>
     <script
       src="https://code.jquery.com/jquery-3.3.1.min.js"
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -15,19 +19,20 @@
     <script src="clicker.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
-
+<!-- body -->
   <body>
-    <div id="container">
-      <div id="intro">
+    <div id="container" class="column">
+      <!-- homepage -->
+      <div id="intro" class="column">
         <h1>Scales Clicker</h1>
         <h3>an analytical yo-yo freestyle scoring tool</h3>
-        <div id="initial-input">
+        <div id="initial-input" class="column">
           <div>
             <label for="initial-yt-link">Freestyle Link</label>
             <input type="text" id="initial-yt-link" name="yt-link" />
           </div>
         </div>
-        <div id="buttons">
+        <div id="buttons" class="row">
           <div>
             <button id="submit" onclick="loadData(false)">Score Video</button>
           </div>
@@ -38,15 +43,16 @@
           </div>
         </div>
       </div>
-      <div id="main">
+      <!-- main page header - need to add keybinds somewhere -->
+      <div id="main" class="column">
         <h1>Scales Clicker</h1>
-        <div id="initial-input">
+        <div id="initial-input" class="column">
           <div>
             <label for="yt-link">Freestyle Link</label>
             <input type="text" id="yt-link" name="yt-link" />
           </div>
         </div>
-        <div id="buttons">
+        <div id="buttons" class="row">
           <div>
             <button id="submit" onclick="loadData(false)">Score Video</button>
           </div>
@@ -57,61 +63,52 @@
           </div>
         </div>
       </div>
+      <!-- select for specific judge - should only be in replay div -->
       <div id="judge-select">
         <select id="judge-pick"></select>
       </div>
-      <!-- <div id="scoring">
-        <div id="click-display">
-          <h2 id="positive-display"></h2>
-          <h2 id="negative-display"></h2>
-        </div>
-        <div id="video-post-container">
-          <div id="video"></div>
-          <div id="otherContent" tabindex="-1"></div>
-          <div id="post-data">
-              <div id="chart"></div>
-          </div>
-      </div>
-      </div> -->
+      <!-- display for + and -, should show on both modes -->
       <div id="scoring">
-        <div id="click-display">
+        <div id="click-display" class="row">
           <h2 id="positive-display"></h2>
           <h2 id="negative-display"></h2>
         </div>
-        <div id="video-chart">
+        <!-- div for video and chart - need to split into two divs for different modes -->
+        <div id="video-chart" class="row">
           <div id="video"></div>
-          <div id="otherContent" tabindex="-1"></div>
           <div id="chart"></div>
         </div>
       </div>
-      <div class="popup" id="flash-prompt">
+      <!-- popup for video flash (replay only version) -->
+      <div class="popup column" id="flash-prompt">
         <p>Flash video border during clicks?</p>
-        <div class="btn-container">
+        <div class="btn-container row">
           <button class="btn btn-yes" onclick="closeFlash(true)">Yes</button>
           <button class="btn btn-no" onclick="closeFlash(false)">No</button>
         </div>
       </div>
+      <!-- popup for judge inputs/flash, need to obstruct for home page too -->
       <div class="popup" id="inputs-popup">
         <div>
           <label for="judge-name">Judge Name</label>
           <input type="text" id="judge-name" name="judge-name" />
         </div>
-        <div id="keybinds">
+        <div id="keybinds" class="row">
           <div>
             <label for="positive-key">+1</label>
-            <input id="positive-key" value="k" size="1" />
+            <input type="text" id="positive-key" value="k" maxlength="1" />
           </div>
           <div>
             <label for="negative-key">-1</label>
-            <input id="negative-key" value="j" size="1" />
+            <input type="text" id="negative-key" value="j" maxlength="1" />
           </div>
           <div>
             <label for="double-key">+2</label>
-            <input id="double-key" value="2" size="1" />
+            <input type="text" id="double-key" value="2" maxlength="1" />
           </div>
           <div>
             <label for="submit-key">Submit</label>
-            <input id="submit-key" value="0" size="1" />
+            <input type="text" id="submit-key" value="0" maxlength="1" />
           </div>
         </div>
         <label for="flash-border-toggle">Flash Border During Clicks</label>
@@ -120,6 +117,7 @@
           <button class="btn btn-yes" onclick="closeInputs()">Save</button>
         </div>
       </div>
+      <!-- popup for saving scores -->
       <div class="popup" id="save-prompt">
         <p>Would you like to submit your scores?</p>
         <div class="btn-container">

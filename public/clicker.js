@@ -49,6 +49,9 @@ var chart;
 var chartOptions;
 var data;
 
+var pageWidth = window.innerWidth;
+var pageHeight = window.innerHeight;
+
 // css functions to hide components, assigning keys
 $(document).ready(function () {
   getJudges();
@@ -121,7 +124,7 @@ $("html").on("keydown", function (event) {
 });
 
 function reset() {
-  setViewingMode("block");
+  setViewingMode(false);
   positiveScore = 0;
   negativeScore = 0;
   judgeSelect = null;
@@ -260,11 +263,11 @@ function importScores() {
         return acc;
       }, {});
       if (JSON.stringify(importData) !== "{}") {
-        setViewingMode("flex");
+        setViewingMode(true);
         generateTimeTicks(importData);
         createChart(importData);
       } else {
-        setViewingMode("block");
+        setViewingMode(false);
         alert("This freestyle has not been scored by anyone.");
         location.reload();
       }
@@ -545,10 +548,10 @@ function drawChart(scores) {
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
+    height: pageHeight * .7
   };
 
   chart = new google.visualization.LineChart(document.getElementById("chart"));
-
   chart.draw(data, chartOptions);
 
   google.visualization.events.addListener(chart, "onmouseover", function (e) {
@@ -628,31 +631,35 @@ function loadVideo() {
 }
 
 function setViewingMode(type) {
-  if (type == "flex") {
+  console.log("Setting Viewing Mode", type);
+  if (type == true) {
     $("#video-chart").css("display", "flex");
+    // $("#chart").css("width", "45%");
+    // $("#video").css("width", "45%");
   } else {
     $("#video-chart").css("display", "block");
+    // $("#chart").css("width", "0%");
+    // $("#chart").css("height", "0%");
+    // $("#video").css("width", "90%");
   }
 }
 
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
-  // ADJUST TO MAKE VIDEO FULL SIZED IF NOT REPLAY MODE
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
-    player = new YT.Player("player", {
-      // 1280 720 is default
-      width: 900,
-      height: 600,
-      videoId: youtubeLink,
-      events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange,
-      },
-    });
+      player = new YT.Player("player", {
+        width: pageWidth * .45,
+        height: pageHeight * .7,
+        videoId: youtubeLink,
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+        },
+      });
+    }
     $("#positive-display").text("+0");
     $("#negative-display").text("-0");
   }
-}
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
@@ -669,7 +676,7 @@ function getScoreAtSecond(time) {
   negativeScore = 0;
   while (i < replayData.length && replayData[i].second < time) {
     if (i > 0) {
-      if (i < replayData.length) { 
+      if (i < replayData.length) {
         var previousScore = replayData[i - 1].score;
         var currentScore = replayData[i].score;
         if (currentScore > previousScore) {
