@@ -68,13 +68,13 @@
         <select id="judge-pick"></select>
       </div>
       <!-- display for + and -, should show on both modes -->
-      <div id="scoring">
+      <div id="scoring" class="column">
         <div id="click-display" class="row">
           <h2 id="positive-display"></h2>
           <h2 id="negative-display"></h2>
         </div>
         <!-- div for video and chart - need to split into two divs for different modes -->
-        <div id="video-chart" class="row">
+        <div id="replay" class="row">
           <div id="video"></div>
           <div id="chart"></div>
         </div>
@@ -89,7 +89,7 @@
       </div>
       <!-- popup for judge inputs/flash, need to obstruct for home page too -->
       <div class="popup" id="inputs-popup">
-        <div>
+        <div class="column">
           <label for="judge-name">Judge Name</label>
           <input type="text" id="judge-name" name="judge-name" />
         </div>
@@ -107,7 +107,7 @@
             <input type="text" id="double-key" value="2" maxlength="1" />
           </div>
           <div>
-            <label for="submit-key">Submit</label>
+            <label for="submit-key">Start</label>
             <input type="text" id="submit-key" value="0" maxlength="1" />
           </div>
         </div>
