@@ -146,18 +146,16 @@ function reset() {
   clearInterval(replayInterval);
   chartSelection = null;
   ticks = [];
-  if ($('#player').length) {
+  if ($("#player").length) {
     document.getElementById("player").innerHTML = "";
   }
-
 }
 
 // hide intro css
 function closeIntro() {
   $("#intro").hide();
-  $("#main").css("display","flex");
+  $("#main").css("display", "flex");
   // $("#main").show();
-  
 }
 
 // popup for flash option
@@ -496,13 +494,13 @@ function drawChart(scores) {
           var deltaValue = symbol + delta;
           newRow.push(
             "<div>" +
-            resultArray[0][i * 2 - 1] +
-            "</div>" +
-            "<div>" +
-            deltaValue +
-            " " +
-            convertIntegerToTime(subArray[0]) +
-            "</div>"
+              resultArray[0][i * 2 - 1] +
+              "</div>" +
+              "<div>" +
+              deltaValue +
+              " " +
+              convertIntegerToTime(subArray[0]) +
+              "</div>"
           );
         }
       }
@@ -516,7 +514,7 @@ function drawChart(scores) {
     animation: {
       startup: true,
       duration: 1000,
-      easing: 'out'
+      easing: "out",
     },
     backgroundColor: "#414141",
     colors: [
@@ -562,7 +560,7 @@ function drawChart(scores) {
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
-    height: pageHeight * .7
+    height: pageHeight * 0.7,
   };
 
   chart = new google.visualization.LineChart(document.getElementById("chart"));
@@ -645,39 +643,50 @@ function loadVideo() {
 }
 
 function setViewingMode(type) {
-  $('#replay').css("display", "flex");
+  $("#replay").css("display", "flex");
   if (type == true) {
     if (playerExists()) {
-      $('#video').css("width", pageWidth * .45);
-      $('#video').css("height", pageHeight * .7);
-      $('#player').css("width", pageWidth);
-      $('#player').css("height", pageHeight * .7);
+      $("#video").css("width", pageWidth * 0.45);
+      $("#video").css("height", pageHeight * 0.7);
+      $("#player").css("width", pageWidth);
+      $("#player").css("height", pageHeight * 0.7);
     }
-    $('#replay').append('<div id="chart"></div>');
+    $("#replay").append('<div id="chart"></div>');
   } else {
     if (playerExists()) {
-      $('#video').css("width", pageWidth * .85);
-      $('#video').css("height", pageHeight * .7);
-      $('#player').css("width", pageWidth * .85);
-      $('#player').css("height", pageHeight * .7);
+      $("#video").css("width", pageWidth * 0.85);
+      $("#video").css("height", pageHeight * 0.7);
+      $("#player").css("width", pageWidth * 0.85);
+      $("#player").css("height", pageHeight * 0.7);
     }
-    $('#chart').remove();
+    $("#chart").remove();
   }
 }
 
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
-    // add if for diff modes like above
-    player = new YT.Player("player", {
-      width: pageWidth * .45,
-      height: pageHeight * .7,
-      videoId: youtubeLink,
-      events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange,
-      },
-    });
+    if (isReplayMode) {
+      player = new YT.Player("player", {
+        width: pageWidth * 0.45,
+        height: pageHeight * 0.7,
+        videoId: youtubeLink,
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+        },
+      });
+    } else {
+      player = new YT.Player("player", {
+        width: pageWidth * 0.85,
+        height: pageHeight * 0.7,
+        videoId: youtubeLink,
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+        },
+      });
+    }
   }
   $("#positive-display").text("+0");
   $("#negative-display").text("-0");
