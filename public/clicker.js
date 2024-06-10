@@ -565,7 +565,7 @@ function drawChart(scores) {
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
-    height: pageHeight * 0.7,
+    height: pageHeight * 0.8,
   };
 
   chart = new google.visualization.LineChart(document.getElementById("chart"));
@@ -652,17 +652,17 @@ function setViewingMode(type) {
   if (type == true) {
     if (playerExists()) {
       $("#video").css("width", pageWidth * 0.45);
-      $("#video").css("height", pageHeight * 0.7);
+      $("#video").css("height", pageHeight * 0.8);
       $("#player").css("width", pageWidth);
-      $("#player").css("height", pageHeight * 0.7);
+      $("#player").css("height", pageHeight * 0.8);
     }
     $("#replay").append('<div id="chart"></div>');
   } else {
     if (playerExists()) {
       $("#video").css("width", pageWidth * 0.85);
-      $("#video").css("height", pageHeight * 0.7);
+      $("#video").css("height", pageHeight * 0.8);
       $("#player").css("width", pageWidth * 0.85);
-      $("#player").css("height", pageHeight * 0.7);
+      $("#player").css("height", pageHeight * 0.8);
     }
     $("#chart").remove();
   }
@@ -674,7 +674,7 @@ function onYouTubeIframeAPIReady() {
     if (isReplayMode) {
       player = new YT.Player("player", {
         width: pageWidth * 0.45,
-        height: pageHeight * 0.7,
+        height: pageHeight * 0.8,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
@@ -684,7 +684,7 @@ function onYouTubeIframeAPIReady() {
     } else {
       player = new YT.Player("player", {
         width: pageWidth * 0.85,
-        height: pageHeight * 0.7,
+        height: pageHeight * 0.8,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
