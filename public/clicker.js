@@ -71,7 +71,11 @@ $(document).ready(function () {
   $("#submit-key").on("keydown", function (submit_e) {
     submitKey = submit_e.keyCode;
   });
-  $(document).on("change", "#judge-pick", handleSelectChange);
+  // $(document).on("change", "#judge-pick", handleSelectChange);
+  $("#yt-link").on("mousedown", function (event) {
+    $(this).focus();
+    event.preventDefault();
+  });
 });
 
 function handleSelectChange() {
@@ -140,7 +144,7 @@ function reset() {
   replayTimeout = null;
   viewSeconds = 0;
   seekMarker = 0;
-  document.getElementById("judge-select").innerHTML = "";
+  // document.getElementById("judge-select").innerHTML = "";
   $("#positive-display").text("+0");
   $("#negative-display").text("-0");
   clearInterval(replayInterval);
@@ -189,6 +193,7 @@ function openSave() {
 function closeSave(response) {
   $("#save-prompt").hide();
   if (response) {
+    handleFocus(false);
     isReplayMode = true;
     formatList();
   } else {
@@ -367,7 +372,7 @@ function appendClicks() {
   })
     .then((response) => response.json())
     .then((data) => {
-      importScores();
+      // importScores();
       return data;
     })
     .catch((error) => {
@@ -494,13 +499,13 @@ function drawChart(scores) {
           var deltaValue = symbol + delta;
           newRow.push(
             "<div>" +
-              resultArray[0][i * 2 - 1] +
-              "</div>" +
-              "<div>" +
-              deltaValue +
-              " " +
-              convertIntegerToTime(subArray[0]) +
-              "</div>"
+            resultArray[0][i * 2 - 1] +
+            "</div>" +
+            "<div>" +
+            deltaValue +
+            " " +
+            convertIntegerToTime(subArray[0]) +
+            "</div>"
           );
         }
       }
@@ -738,20 +743,33 @@ function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
     wasPaused = false;
     // need to reimplement this for key inputs interacting with video
-    $('#focusable').focus();
-    $(document).on("keydown", handleKeydown);
-  } else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
-    wasPaused = false;
-    selectJudge();
-    seekMarker = player.getCurrentTime();
-    isPaused = false;
-    replayTimer();
-  } else if (event.data == YT.PlayerState.PAUSED) {
-    $(document).off("keydown", handleKeydown);
+    handleFocus(true);
+    // $(document).on("keydown", handleKeydown);
+  }
+  // else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
+  //   wasPaused = false;
+  //   selectJudge();
+  //   seekMarker = player.getCurrentTime();
+  //   isPaused = false;
+  //   replayTimer();
+  // } 
+  else if (event.data == YT.PlayerState.PAUSED) {
+    handleFocus(false);
+    // $(document).off("keydown", handleKeydown);
     wasPaused = true;
     pauseTimer();
   } else if (event.data == YT.PlayerState.CUED) {
+    handleFocus(false);
     wasPaused = true;
+  }
+}
+
+function handleFocus(focus) {
+  if (focus == true) {
+    $('#focusable').focus();
+  }
+  else {
+    $('#focusable').blur();
   }
 }
 

@@ -29,24 +29,19 @@
         <div id="initial-input" class="column">
           <div>
             <label for="initial-yt-link">Freestyle Link</label>
-            <input type="text" id="initial-yt-link" name="yt-link" />
+            <input type="text" id="initial-yt-link" name="initial-yt-link" />
           </div>
         </div>
         <div id="buttons" class="row">
           <div>
             <button id="submit" onclick="loadData(false)">Score Video</button>
           </div>
-          <div>
-            <button id="view-scores" onclick="loadData(true)">
-              Show Scores for Video
-            </button>
-          </div>
         </div>
       </div>
       <!-- main page header - need to add keybinds somewhere -->
       <div id="main" class="column">
         <h1>Scales Clicker</h1>
-        <div id="initial-input" class="column">
+        <div id="main-input" class="column">
           <div>
             <label for="yt-link">Freestyle Link</label>
             <input type="text" id="yt-link" name="yt-link" />
@@ -56,16 +51,7 @@
           <div>
             <button id="submit" onclick="loadData(false)">Score Video</button>
           </div>
-          <div>
-            <button id="view-scores" onclick="loadData(true)">
-              Show Scores for Video
-            </button>
-          </div>
         </div>
-      </div>
-      <!-- select for specific judge - should only be in replay div -->
-      <div id="judge-select">
-        <select id="judge-pick"></select>
       </div>
       <!-- display for + and -, should show on both modes -->
       <div id="scoring" class="column">
@@ -77,7 +63,6 @@
         <div id="replay" class="row">
           <div id="focusable" tabindex="-1"></div>
           <div id="video"></div>
-          <div id="chart"></div>
         </div>
       </div>
       <!-- popup for video flash (replay only version) -->
