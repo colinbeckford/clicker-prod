@@ -211,3 +211,10 @@ button:hover {
   background-color: #5bebaf;
   color: black;
 }
+
+#focusable {
+  position: absolute;
+  width: 0;
+  height: 0;
+  outline: none;
+}

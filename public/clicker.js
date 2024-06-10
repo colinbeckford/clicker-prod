@@ -694,6 +694,7 @@ function onYouTubeIframeAPIReady() {
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
+  $('#focusable').focus();
   event.target.pauseVideo();
   if (isReplayMode) {
     checkInterval = setInterval(seekIndicator, 1000);
@@ -737,7 +738,7 @@ function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
     wasPaused = false;
     // need to reimplement this for key inputs interacting with video
-    $("#otherContent").focus();
+    $('#focusable').focus();
     $(document).on("keydown", handleKeydown);
   } else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
     wasPaused = false;
