@@ -372,6 +372,7 @@ function appendClicks() {
   })
     .then((response) => response.json())
     .then((data) => {
+      alert("Your scores for this freestyle have been submitted!");
       // importScores();
       return data;
     })
