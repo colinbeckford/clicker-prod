@@ -84,6 +84,7 @@ body {
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
+  padding-bottom: 5px;
 }
 
 .updating {
