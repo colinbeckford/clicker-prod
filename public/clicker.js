@@ -375,6 +375,7 @@ function getFreestyles() {
 }
 
 function appendClicks() {
+  console.log("Appending Clicks");
   fetch("/appendClicks", {
     method: "POST",
     headers: {
