@@ -76,6 +76,15 @@ $(document).ready(function () {
     $(this).focus();
     event.preventDefault();
   });
+
+  window.onerror = function (message, source, lineno, colno, error) {
+    console.error('Error message:', message);
+    console.error('Source:', source);
+    console.error('Line number:', lineno);
+    console.error('Column number:', colno);
+    console.error('Error object:', error);
+    alert("There has been an error with this application, please refresh.");
+  }
 });
 
 function handleSelectChange() {
@@ -120,14 +129,17 @@ $("html").on("keydown", function (event) {
       }
       // submit
     } else if (event.which == submitKey && canSubmit == true) {
-      isReplayMode = false;
-      clearInterval(checkInterval);
-      player.stopVideo();
-      // timer to open save menu - could fix styling logic here
-      var confirmSave = setTimeout(openSave, 500);
+      beginSave();
     }
   }
 });
+
+function beginSave() {
+  isReplayMode = false;
+  clearInterval(checkInterval);
+  player.stopVideo();
+  var confirmSave = setTimeout(openSave, 500);
+}
 
 function reset() {
   setViewingMode(false);
@@ -370,13 +382,19 @@ function appendClicks() {
     },
     body: JSON.stringify({ dataArray: formattedExport }),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
     .then((data) => {
       alert("Your scores for this freestyle have been submitted!");
       // importScores();
       return data;
     })
     .catch((error) => {
+      alert("There has been an error with saving the score for this routine. Please refresh and try again.");
       console.error("Error:", error);
     });
 }

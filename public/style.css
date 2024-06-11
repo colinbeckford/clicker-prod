@@ -83,8 +83,16 @@ body {
   position: relative;
   justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
   padding-bottom: 20px;
+}
+
+#save-btn {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .updating {
