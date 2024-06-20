@@ -72,6 +72,19 @@ $(document).ready(function () {
     submitKey = submit_e.keyCode;
   });
   $(document).on("change", "#judge-pick", handleSelectChange);
+  $("#yt-link").on("mousedown", function (event) {
+    $(this).focus();
+    event.preventDefault();
+  });
+
+  window.onerror = function (message, source, lineno, colno, error) {
+    console.error('Error message:', message);
+    console.error('Source:', source);
+    console.error('Line number:', lineno);
+    console.error('Column number:', colno);
+    console.error('Error object:', error);
+    alert("There has been an error with this application, please refresh.");
+  }
 });
 
 function handleSelectChange() {
@@ -116,14 +129,17 @@ $("html").on("keydown", function (event) {
       }
       // submit
     } else if (event.which == submitKey && canSubmit == true) {
-      isReplayMode = false;
-      clearInterval(checkInterval);
-      player.stopVideo();
-      // timer to open save menu - could fix styling logic here
-      var confirmSave = setTimeout(openSave, 500);
+      beginSave();
     }
   }
 });
+
+function beginSave() {
+  isReplayMode = false;
+  clearInterval(checkInterval);
+  player.stopVideo();
+  var confirmSave = setTimeout(openSave, 500);
+}
 
 function reset() {
   setViewingMode(false);
@@ -189,10 +205,10 @@ function openSave() {
 function closeSave(response) {
   $("#save-prompt").hide();
   if (response) {
+    handleFocus(false);
     isReplayMode = true;
     formatList();
-  } else {
-  }
+  } 
 }
 
 // opens judge select
@@ -358,6 +374,7 @@ function getFreestyles() {
 }
 
 function appendClicks() {
+  console.log("Appending Clicks");
   fetch("/appendClicks", {
     method: "POST",
     headers: {
@@ -365,12 +382,19 @@ function appendClicks() {
     },
     body: JSON.stringify({ dataArray: formattedExport }),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
     .then((data) => {
+      alert("Your scores for this freestyle have been submitted!");
       importScores();
       return data;
     })
     .catch((error) => {
+      alert("There has been an error with saving the score for this routine. Please refresh and try again.");
       console.error("Error:", error);
     });
 }
@@ -494,13 +518,13 @@ function drawChart(scores) {
           var deltaValue = symbol + delta;
           newRow.push(
             "<div>" +
-              resultArray[0][i * 2 - 1] +
-              "</div>" +
-              "<div>" +
-              deltaValue +
-              " " +
-              convertIntegerToTime(subArray[0]) +
-              "</div>"
+            resultArray[0][i * 2 - 1] +
+            "</div>" +
+            "<div>" +
+            deltaValue +
+            " " +
+            convertIntegerToTime(subArray[0]) +
+            "</div>"
           );
         }
       }
@@ -560,7 +584,7 @@ function drawChart(scores) {
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
-    height: pageHeight * 0.7,
+    height: pageHeight * 0.8,
   };
 
   chart = new google.visualization.LineChart(document.getElementById("chart"));
@@ -647,17 +671,17 @@ function setViewingMode(type) {
   if (type == true) {
     if (playerExists()) {
       $("#video").css("width", pageWidth * 0.45);
-      $("#video").css("height", pageHeight * 0.7);
+      $("#video").css("height", pageHeight * 0.8);
       $("#player").css("width", pageWidth);
-      $("#player").css("height", pageHeight * 0.7);
+      $("#player").css("height", pageHeight * 0.8);
     }
     $("#replay").append('<div id="chart"></div>');
   } else {
     if (playerExists()) {
       $("#video").css("width", pageWidth * 0.85);
-      $("#video").css("height", pageHeight * 0.7);
+      $("#video").css("height", pageHeight * 0.8);
       $("#player").css("width", pageWidth * 0.85);
-      $("#player").css("height", pageHeight * 0.7);
+      $("#player").css("height", pageHeight * 0.8);
     }
     $("#chart").remove();
   }
@@ -669,7 +693,7 @@ function onYouTubeIframeAPIReady() {
     if (isReplayMode) {
       player = new YT.Player("player", {
         width: pageWidth * 0.45,
-        height: pageHeight * 0.7,
+        height: pageHeight * 0.8,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
@@ -679,7 +703,7 @@ function onYouTubeIframeAPIReady() {
     } else {
       player = new YT.Player("player", {
         width: pageWidth * 0.85,
-        height: pageHeight * 0.7,
+        height: pageHeight * 0.8,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
@@ -738,20 +762,33 @@ function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
     wasPaused = false;
     // need to reimplement this for key inputs interacting with video
-    $('#focusable').focus();
-    $(document).on("keydown", handleKeydown);
-  } else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
+    handleFocus(true);
+    // $(document).on("keydown", handleKeydown);
+  }
+  else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
     wasPaused = false;
     selectJudge();
     seekMarker = player.getCurrentTime();
     isPaused = false;
     replayTimer();
-  } else if (event.data == YT.PlayerState.PAUSED) {
-    $(document).off("keydown", handleKeydown);
+  } 
+  else if (event.data == YT.PlayerState.PAUSED) {
+    handleFocus(false);
+    // $(document).off("keydown", handleKeydown);
     wasPaused = true;
     pauseTimer();
   } else if (event.data == YT.PlayerState.CUED) {
+    handleFocus(false);
     wasPaused = true;
+  }
+}
+
+function handleFocus(focus) {
+  if (focus == true) {
+    $('#focusable').focus();
+  }
+  else {
+    $('#focusable').blur();
   }
 }
 
