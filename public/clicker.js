@@ -93,7 +93,7 @@ function handleSelectChange() {
 }
 // key click functions
 $("html").on("keydown", function (event) {
-  if (!isReplayMode) {
+  if (!isReplayMode && playerExists()) {
     // negative click
     if (event.which == negativeKey && player.getPlayerState() == 1) {
       canSubmit = true;
@@ -156,7 +156,7 @@ function reset() {
   replayTimeout = null;
   viewSeconds = 0;
   seekMarker = 0;
-  document.getElementById("judge-select").innerHTML = "";
+  // document.getElementById("judge-select").innerHTML = "";
   $("#positive-display").text("+0");
   $("#negative-display").text("-0");
   clearInterval(replayInterval);
@@ -687,6 +687,42 @@ function setViewingMode(type) {
   }
 }
 
+// pauses video onload and retrieves index of selected judge
+function onPlayerReady(event) {
+  $('#focusable').focus();
+  event.target.pauseVideo();
+  if (isReplayMode) {
+    checkInterval = setInterval(seekIndicator, 1000);
+  }
+}
+
+// calls view timer function if the user wants to view scores
+// may need to re-assess/condense - is/was paused
+function onPlayerStateChange(event) {
+  if (event.data == YT.PlayerState.PLAYING && isReplayMode == false) {
+    wasPaused = false;
+    // need to reimplement this for key inputs interacting with video
+    handleFocus(true);
+    // $(document).on("keydown", handleKeydown);
+  }
+  // else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
+  //   wasPaused = false;
+  //   selectJudge();
+  //   seekMarker = player.getCurrentTime();
+  //   isPaused = false;
+  //   replayTimer();
+  // } 
+  else if (event.data == YT.PlayerState.PAUSED) {
+    handleFocus(false);
+    // $(document).off("keydown", handleKeydown);
+    wasPaused = true;
+    pauseTimer();
+  } else if (event.data == YT.PlayerState.CUED) {
+    handleFocus(false);
+    wasPaused = true;
+  }
+}
+
 // loads video into youtube player
 function onYouTubeIframeAPIReady() {
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
@@ -714,15 +750,6 @@ function onYouTubeIframeAPIReady() {
   }
   $("#positive-display").text("+0");
   $("#negative-display").text("-0");
-}
-
-// pauses video onload and retrieves index of selected judge
-function onPlayerReady(event) {
-  $('#focusable').focus();
-  event.target.pauseVideo();
-  if (isReplayMode) {
-    checkInterval = setInterval(seekIndicator, 1000);
-  }
 }
 
 // scrolls through list of scores to retrieve the click value at a specific time
