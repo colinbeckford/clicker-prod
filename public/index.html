@@ -11,8 +11,11 @@
   <script type="text/javascript">
     google.charts.load("current", { packages: ["corechart", "line"] });
   </script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="clicker.js"></script>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <!-- body -->
 
@@ -24,30 +27,44 @@
       <h3>an analytical yo-yo freestyle scoring tool</h3>
       <div id="initial-input" class="column">
         <div>
-          <label for="initial-yt-link">Freestyle Link</label>
-          <input type="text" id="initial-yt-link" name="initial-yt-link" />
+          <label for="initial-yt-link" class="form-label">Freestyle Link</label>
+          <input id="initial-yt-link" class="form-control" type="text" aria-label="yt-link">
         </div>
       </div>
-      <div id="buttons" class="row">
+      <div id="buttons" class="row mt-2">
         <div>
-          <button id="submit" onclick="loadData(false)">Score Video</button>
+          <button class="btn btn-outline-light btn-sm" id="submit" onclick="loadData(false)">Score Video</button>
+        </div>
+        <div>
+          <button class="btn btn-outline-light btn-sm" id="view-scores" onclick="loadData(true)">
+            Replay Clicks
+          </button>
         </div>
       </div>
     </div>
     <!-- main page header - need to add keybinds somewhere -->
     <div id="main" class="column">
       <h1>Scales Clicker</h1>
-      <div id="main-input" class="column">
+      <div id="initial-input" class="column">
         <div>
-          <label for="yt-link">Freestyle Link</label>
-          <input type="text" id="yt-link" name="yt-link" />
+          <label for="yt-link" class="form-label">Freestyle Link</label>
+          <input id="yt-link" class="form-control" type="text" aria-label="yt-link">
         </div>
       </div>
       <div id="buttons" class="row">
         <div>
-          <button id="submit" onclick="loadData(false)">Score Video</button>
+          <button class="btn btn-outline-light btn-sm" id="submit" onclick="loadData(false)">Score Video</button>
+        </div>
+        <div>
+          <button class="btn btn-outline-light btn-sm" id="view-scores" onclick="loadData(true)">
+            Replay Clicks
+          </button>
         </div>
       </div>
+    </div>
+    <!-- select for specific judge - should only be in replay div -->
+    <div id="judge-select">
+      <select id="judge-pick"></select>
     </div>
     <!-- display for + and -, should show on both modes -->
     <div id="scoring" class="column">
@@ -55,21 +72,19 @@
         <h2 id="positive-display"></h2>
         <h2 id="negative-display"></h2>
       </div>
-      <div class="row">
-        <button id="save-btn" class="btn btn-yes" onclick="beginSave()"> Save Score </button>
-      </div>
       <!-- div for video and chart - need to split into two divs for different modes -->
       <div id="replay" class="row">
         <div id="focusable" tabindex="-1"></div>
         <div id="video"></div>
+        <div id="chart"></div>
       </div>
     </div>
     <!-- popup for video flash (replay only version) -->
     <div class="popup column" id="flash-prompt">
       <p>Flash video border during clicks?</p>
       <div class="btn-container row">
-        <button class="btn btn-yes" onclick="closeFlash(true)">Yes</button>
-        <button class="btn btn-no" onclick="closeFlash(false)">No</button>
+        <button class="btn btn-success btn-sm" onclick="closeFlash(true)">Yes</button>
+        <button class="btn btn-danger btn-sm" onclick="closeFlash(false)">No</button>
       </div>
     </div>
     <!-- popup for judge inputs/flash, need to obstruct for home page too -->
@@ -78,38 +93,36 @@
         <label for="judge-name">Judge Name</label>
         <input type="text" id="judge-name" name="judge-name" />
       </div>
-      <div id="keybinds">
-        <div class="row">
-          <div>
-            <label for="positive-key">+1</label>
-            <input type="text" id="positive-key" value="k" maxlength="1" />
-          </div>
-          <div>
-            <label for="negative-key">-1</label>
-            <input type="text" id="negative-key" value="j" maxlength="1" />
-          </div>
-          <div>
-            <label for="double-key">+2</label>
-            <input type="text" id="double-key" value="2" maxlength="1" />
-          </div>
+      <div id="keybinds" class="row">
+        <div>
+          <label for="positive-key">+1</label>
+          <input type="text" id="positive-key" value="k" maxlength="1" />
         </div>
         <div>
-          <label for="submit-key">Save Score</label>
+          <label for="negative-key">-1</label>
+          <input type="text" id="negative-key" value="j" maxlength="1" />
+        </div>
+        <div>
+          <label for="double-key">+2</label>
+          <input type="text" id="double-key" value="2" maxlength="1" />
+        </div>
+        <div>
+          <label for="submit-key">Save</label>
           <input type="text" id="submit-key" value="0" maxlength="1" />
         </div>
       </div>
       <label for="flash-border-toggle">Flash Border During Clicks</label>
       <input type="checkbox" id="flash-border-toggle" />
       <div class="btn-container">
-        <button class="btn btn-yes" onclick="closeInputs()">Save</button>
+        <button class="btn btn-outline-light btn-sm" onclick="closeInputs()">Save</button>
       </div>
     </div>
     <!-- popup for saving scores -->
     <div class="popup" id="save-prompt">
       <p>Would you like to submit your scores?</p>
       <div class="btn-container">
-        <button class="btn btn-yes" onclick="closeSave(true)">Yes</button>
-        <button class="btn btn-no" onclick="closeSave(false)">No</button>
+        <button class="btn btn-success btn-sm" onclick="closeSave(true)">Yes</button>
+        <button class="btn btn-danger btn-sm" onclick="closeSave(false)">No</button>
       </div>
     </div>
   </div>
