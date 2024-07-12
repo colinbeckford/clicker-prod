@@ -52,6 +52,20 @@ var data;
 var pageWidth = window.innerWidth;
 var pageHeight = window.innerHeight;
 
+const judge_codes = [
+  { judgeName: "Tyler H", judgeCode: "a1b2c" },
+  { judgeName: "Connor S", judgeCode: "d3e4f" },
+  { judgeName: "Levi W", judgeCode: "g5h6i" },
+  { judgeName: "Dylan S", judgeCode: "j7k8l" },
+  { judgeName: "Chen Z", judgeCode: "m9n0o" },
+  { judgeName: "Dave S", judgeCode: "p1q2r" },
+  { judgeName: "Michael F", judgeCode: "s3t4u" },
+  { judgeName: "Sean C", judgeCode: "v5w6x" },
+  { judgeName: "Andy K", judgeCode: "y7z8a" },
+  { judgeName: "Paul H", judgeCode: "b9c0d" },
+  { judgeName: "Jake T", judgeCode: "e1f2g" }
+];
+
 // css functions to hide components, assigning keys
 $(document).ready(function () {
   getJudges();
@@ -208,7 +222,7 @@ function closeSave(response) {
     handleFocus(false);
     isReplayMode = true;
     formatList();
-  } 
+  }
 }
 
 // opens judge select
@@ -321,56 +335,140 @@ function chopLink(link) {
   return link;
 }
 
+function filterJudge(url, data) {
+  const urlParams = new URLSearchParams(new URL(url).search);
+  const code = urlParams.get('nyyl');
+  var filteredJudge;
+  console.log(code);
+  for (let judge of judge_codes) {
+    if (judge.judgeCode == code) {
+      filteredJudge = judge.judgeName;
+    }
+  }
+  let judgeCount = 1;
+  let replacedJudges = {};
+
+  data.forEach(entry => {
+    if (entry.judge !== filteredJudge && !replacedJudges[entry.judge]) {
+      replacedJudges[entry.judge] = `Judge ${judgeCount++}`;
+    }
+
+    entry.judge = replacedJudges[entry.judge] || entry.judge;
+  });
+  console.log("Filtering Judge");
+  return data;
+}
+
 // api call to get other instances of freestyle scored
 function getScores(link) {
-  return fetch(`/getClicks/${link}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-      throw error;
-    });
+  if (window.location.href.includes("nyyl")) {
+    return fetch(`/getClicks_NYYL/${link}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(filterJudge(window.location.href, data));
+        console.log(data);
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        throw error;
+      });
+  }
+  else {
+    return fetch(`/getClicks/${link}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        throw error;
+      });
+  }
+
 }
 
 function getJudges() {
-  return fetch(`/getJudges`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-      throw error;
-    });
+  if (window.location.href.includes("nyyl")) {
+    return fetch(`/getJudges_NYYL`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        throw error;
+      });
+  }
+  else {
+    return fetch(`/getJudges`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        throw error;
+      });
+  }
 }
 
+
 function getFreestyles() {
-  return fetch(`/getLinks`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-      throw error;
-    });
+  if (window.location.href.includes("nyyl")) {
+    return fetch(`/getLinks_NYYL`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        throw error;
+      });
+  }
+  else {
+    return fetch(`/getLinks`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        throw error;
+      });
+  }
+
 }
 
 function appendClicks() {
@@ -798,7 +896,7 @@ function onPlayerStateChange(event) {
     seekMarker = player.getCurrentTime();
     isPaused = false;
     replayTimer();
-  } 
+  }
   else if (event.data == YT.PlayerState.PAUSED) {
     handleFocus(false);
     // $(document).off("keydown", handleKeydown);
