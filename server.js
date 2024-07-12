@@ -40,10 +40,10 @@ app.listen((process.env.PORT || port), () => {
 
 app.post('/appendClicks', (req, res) => {
     const dataArray = req.body.dataArray;
-    const insertQuery = 'INSERT INTO 2024nyyl (judge, link, second, score) VALUES ?';
+    const insertQuery = 'INSERT INTO 2024clicks (judge, link, second, score) VALUES ?';
     db.query(insertQuery, [dataArray], (insertErr, result) => {
         if (insertErr) {
-          console.error('Error inserting data into "2024nyyl" table:', insertErr);
+          console.error('Error inserting data into "2024clicks" table:', insertErr);
           res.status(500).json({ error: 'Internal Server Error' });
         } else {
           res.json({ message: 'Data received and inserted successfully!' });
@@ -52,6 +52,19 @@ app.post('/appendClicks', (req, res) => {
   });
 
 app.get('/getClicks/:link', (req, res) => {
+    const linkValue = req.params.link;
+    const selectQuery = 'SELECT * FROM 2024clicks WHERE link = ?';
+    db.query(selectQuery, [linkValue], (selectErr, result) => {
+      if (selectErr) {
+        console.error('Error retrieving data from "2024clicks" table:', selectErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
+  app.get('/getClicks_NYYL/:link', (req, res) => {
     const linkValue = req.params.link;
     const selectQuery = 'SELECT * FROM 2024nyyl WHERE link = ?';
     db.query(selectQuery, [linkValue], (selectErr, result) => {
@@ -65,6 +78,18 @@ app.get('/getClicks/:link', (req, res) => {
   });
 
   app.get('/getJudges', (req, res) => {
+    const selectQuery = 'SELECT judge, COUNT(DISTINCT link) AS count FROM 2024clicks GROUP BY judge ORDER BY count DESC';
+    db.query(selectQuery, (selectErr, result) => {
+      if (selectErr) {
+        console.error('Error retrieving data from "2024clicks" table:', selectErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
+  app.get('/getJudges_NYYL', (req, res) => {
     const selectQuery = 'SELECT judge, COUNT(DISTINCT link) AS count FROM 2024nyyl GROUP BY judge ORDER BY count DESC';
     db.query(selectQuery, (selectErr, result) => {
       if (selectErr) {
@@ -77,6 +102,18 @@ app.get('/getClicks/:link', (req, res) => {
   });
   
   app.get('/getLinks', (req, res) => {
+    const selectQuery = 'SELECT link, COUNT(DISTINCT judge) AS count FROM 2024clicks GROUP BY link ORDER BY count DESC';
+    db.query(selectQuery, (selectErr, result) => {
+      if (selectErr) {
+        console.error('Error retrieving data from "2024nyyl" table:', selectErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
+  app.get('/getLinks_NYYL', (req, res) => {
     const selectQuery = 'SELECT link, COUNT(DISTINCT judge) AS count FROM 2024nyyl GROUP BY link ORDER BY count DESC';
     db.query(selectQuery, (selectErr, result) => {
       if (selectErr) {
