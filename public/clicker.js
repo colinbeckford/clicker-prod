@@ -52,22 +52,11 @@ var data;
 var pageWidth = window.innerWidth;
 var pageHeight = window.innerHeight;
 
-const judge_codes = [
-  { judgeName: "Tyler H", judgeCode: "a1b2c" },
-  { judgeName: "Connor S", judgeCode: "d3e4f" },
-  { judgeName: "Levi W", judgeCode: "g5h6i" },
-  { judgeName: "Dylan S", judgeCode: "j7k8l" },
-  { judgeName: "Chen Z", judgeCode: "m9n0o" },
-  { judgeName: "Dave S", judgeCode: "p1q2r" },
-  { judgeName: "Michael F", judgeCode: "s3t4u" },
-  { judgeName: "Sean C", judgeCode: "v5w6x" },
-  { judgeName: "Andy K", judgeCode: "y7z8a" },
-  { judgeName: "Paul H", judgeCode: "b9c0d" },
-  { judgeName: "Jake T", judgeCode: "e1f2g" }
-];
+var judge_codes;
 
 // css functions to hide components, assigning keys
 $(document).ready(function () {
+  getCodes();
   getJudges();
   getFreestyles();
   // gets url of location
@@ -339,7 +328,6 @@ function filterJudge(url, data) {
   const urlParams = new URLSearchParams(new URL(url).search);
   const code = urlParams.get('nyyl');
   var filteredJudge;
-  console.log(code);
   for (let judge of judge_codes) {
     if (judge.judgeCode == code) {
       filteredJudge = judge.judgeName;
@@ -355,8 +343,16 @@ function filterJudge(url, data) {
 
     entry.judge = replacedJudges[entry.judge] || entry.judge;
   });
-  console.log("Filtering Judge");
   return data;
+}
+
+function getCodes() {
+  fetch('../config/config.json')
+  .then(response => response.json())
+  .then(data => {
+    judge_codes = data.judge_codes;
+  })
+  .catch(error => console.error('Error loading config:', error));
 }
 
 // api call to get other instances of freestyle scored
@@ -370,8 +366,7 @@ function getScores(link) {
         return response.json();
       })
       .then((data) => {
-        console.log(filterJudge(window.location.href, data));
-        console.log(data);
+        filterJudge(window.location.href, data);
         return data;
       })
       .catch((error) => {
@@ -408,7 +403,6 @@ function getJudges() {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         return data;
       })
       .catch((error) => {
@@ -472,7 +466,6 @@ function getFreestyles() {
 }
 
 function appendClicks() {
-  console.log("Appending Clicks");
   fetch("/appendClicks", {
     method: "POST",
     headers: {

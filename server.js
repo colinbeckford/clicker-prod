@@ -31,6 +31,7 @@ db.getConnection(err => {
 app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/config', express.static(path.join(__dirname, 'config')));
 
 // Start the server
 
