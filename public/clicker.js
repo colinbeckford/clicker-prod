@@ -257,6 +257,8 @@ function openScoring() {
 // closes the inputs for judge name and keybinds
 function closeInputs() {
   isFlash = $("#flash-border-toggle").prop("checked");
+  console.log("Is Flash", isFlash);
+  console.log("Is Replay Mode", isReplayMode);
   judgeName = $("#judge-name").val();
   $("#inputsModal").modal('hide');
   fetchPage();
@@ -266,8 +268,9 @@ function closeInputs() {
     openSelect();
     createDropdown(importData);
   }
-
-  loadVideo();
+  setTimeout(() => {
+    loadVideo();
+  }, 500);
 }
 
 // returns boolean if the youtube player has been initialized
