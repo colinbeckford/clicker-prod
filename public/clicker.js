@@ -232,7 +232,7 @@ function closeSelect() {
 
 // opens the inputs for judge name and keybinds
 function openInputs() {
-  $("#inputs-popup").show();
+  $("#inputsModal").modal('show');
 }
 
 // opens the scoring display
@@ -244,7 +244,7 @@ function openScoring() {
 function closeInputs() {
   isFlash = $("#flash-border-toggle").prop("checked");
   judgeName = $("#judge-name").val();
-  $("#inputs-popup").hide();
+  $("#inputsModal").modal('show');
   openScoring();
   if (isReplayMode) {
     importScores();
