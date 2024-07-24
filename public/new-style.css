@@ -7,3 +7,20 @@ html, body {
 .dark-teal {
     background-color: #062229;
 }
+
+.google-visualization-tooltip {
+    font-family: Courier, monospace !important;
+    font-size: 20px !important;
+    color: #5bebaf !important;
+    background-color: #383838 !important;
+    padding: 10px 5px 0px 5px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    text-align: center !important;
+    opacity: 0.8 !important;
+  }
+
+#chart, #video {
+    width: 560;
+    height: 315;
+}

@@ -260,7 +260,7 @@ function closeInputs() {
   judgeName = $("#judge-name").val();
   $("#inputsModal").modal('hide');
   fetchPage();
-  //openScoring();
+  openScoring();
   if (isReplayMode) {
     importScores();
     openSelect();
@@ -690,7 +690,8 @@ function drawChart(scores) {
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
-    height: pageHeight * 0.8,
+    width: 560,
+    height: 315
   };
 
   chart = new google.visualization.LineChart(document.getElementById("chart"));
@@ -776,18 +777,18 @@ function setViewingMode(type) {
   $("#replay").css("display", "flex");
   if (type == true) {
     if (playerExists()) {
-      $("#video").css("width", pageWidth * 0.45);
-      $("#video").css("height", pageHeight * 0.8);
-      $("#player").css("width", pageWidth);
-      $("#player").css("height", pageHeight * 0.8);
+      // $("#video").css("width", pageWidth * 0.45);
+      // $("#video").css("height", pageHeight * 0.8);
+      // $("#player").css("width", pageWidth);
+      // $("#player").css("height", pageHeight * 0.8);
     }
     $("#replay").append('<div id="chart"></div>');
   } else {
     if (playerExists()) {
-      $("#video").css("width", pageWidth * 0.85);
-      $("#video").css("height", pageHeight * 0.8);
-      $("#player").css("width", pageWidth * 0.85);
-      $("#player").css("height", pageHeight * 0.8);
+      // $("#video").css("width", pageWidth * 0.85);
+      // $("#video").css("height", pageHeight * 0.8);
+      // $("#player").css("width", pageWidth * 0.85);
+      // $("#player").css("height", pageHeight * 0.8);
     }
     $("#chart").remove();
   }
@@ -834,8 +835,8 @@ function onYouTubeIframeAPIReady() {
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
     if (isReplayMode) {
       player = new YT.Player("player", {
-        width: pageWidth * 0.45,
-        height: pageHeight * 0.8,
+        width: 560,
+        height: 315,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
@@ -844,8 +845,6 @@ function onYouTubeIframeAPIReady() {
       });
     } else {
       player = new YT.Player("player", {
-        width: pageWidth * 0.85,
-        height: pageHeight * 0.8,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
