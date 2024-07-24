@@ -49,9 +49,6 @@ var chart;
 var chartOptions;
 var data;
 
-var pageWidth = window.innerWidth;
-var pageHeight = window.innerHeight;
-
 var judge_codes;
 
 // css functions to hide components, assigning keys
@@ -230,8 +227,8 @@ function closeSave(response) {
 
 // opens judge select
 function openSelect() {
-  $("#judge-select").show();
-  openScoring();
+  console.log("Open select");
+  $("#judge-select").css("display", "flex");
   setTimeout(function () {
     if (isReplayMode) {
       createDropdown(importData);
@@ -249,11 +246,6 @@ function openInputs() {
   $("#inputsModal").modal('show');
 }
 
-// opens the scoring display
-function openScoring() {
-  $("#scoring").show();
-}
-
 // closes the inputs for judge name and keybinds
 function closeInputs() {
   isFlash = $("#flash-border-toggle").prop("checked");
@@ -262,7 +254,6 @@ function closeInputs() {
   judgeName = $("#judge-name").val();
   $("#inputsModal").modal('hide');
   fetchPage();
-  openScoring();
   if (isReplayMode) {
     importScores();
     openSelect();
@@ -776,23 +767,16 @@ function loadVideo() {
   }
 }
 
+
 function setViewingMode(type) {
   $("#replay").css("display", "flex");
   if (type == true) {
-    if (playerExists()) {
-      // $("#video").css("width", pageWidth * 0.45);
-      // $("#video").css("height", pageHeight * 0.8);
-      // $("#player").css("width", pageWidth);
-      // $("#player").css("height", pageHeight * 0.8);
-    }
-    $("#replay").append('<div id="chart"></div>');
+    $("#replay").append(`
+      <div class="col-md-6 d-flex justify-content-center">
+          <div id="chart" class="w-100"></div>
+      </div>
+  `);
   } else {
-    if (playerExists()) {
-      // $("#video").css("width", pageWidth * 0.85);
-      // $("#video").css("height", pageHeight * 0.8);
-      // $("#player").css("width", pageWidth * 0.85);
-      // $("#player").css("height", pageHeight * 0.8);
-    }
     $("#chart").remove();
   }
 }
@@ -846,8 +830,13 @@ function onYouTubeIframeAPIReady() {
           onStateChange: onPlayerStateChange,
         },
       });
+      $("#video-frame").addClass("col-md-6");
     } else {
+      $("#video-frame").removeClass("col-md-6");
+      //remove chart code? check for this
       player = new YT.Player("player", {
+        width: 800,
+        height: 450,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,

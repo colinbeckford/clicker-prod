@@ -4,6 +4,10 @@ html, body {
     overflow: hidden;
   }
 
+replay {
+    width: max-content;
+}
+
 .dark-teal {
     background-color: #062229;
 }
@@ -19,8 +23,3 @@ html, body {
     text-align: center !important;
     opacity: 0.8 !important;
   }
-
-#chart, #video {
-    width: 560;
-    height: 315;
-}
