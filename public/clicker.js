@@ -82,10 +82,6 @@ $(document).ready(function () {
 
   window.onerror = function (message, source, lineno, colno, error) {
     console.error('Error message:', message);
-    console.error('Source:', source);
-    console.error('Line number:', lineno);
-    console.error('Column number:', colno);
-    console.error('Error object:', error);
     alert("There has been an error with this application, please refresh.");
   }
 });
@@ -172,8 +168,9 @@ function reset() {
 
 // hide intro css
 function closeIntro() {
-  $("#intro").hide();
-  $("#main").css("display", "flex");
+  //$("#intro").hide();
+  $("#intro").remove();
+  //$("#main").css("display", "flex");
   // $("#main").show();
 }
 
@@ -182,9 +179,26 @@ function openFlash() {
   $("#flashPromptModal").modal('show');
 }
 
+function fetchPage() {
+  fetch('score.html')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('main').innerHTML = data;
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
+}
+
 // close popup for flash option
 function closeFlash(response) {
   $("#flashPromptModal").modal('hide');
+  fetchPage();
   if (response) {
     isFlash = true;
   } else {
@@ -245,7 +259,8 @@ function closeInputs() {
   isFlash = $("#flash-border-toggle").prop("checked");
   judgeName = $("#judge-name").val();
   $("#inputsModal").modal('hide');
-  openScoring();
+  fetchPage();
+  //openScoring();
   if (isReplayMode) {
     importScores();
     openSelect();
@@ -348,11 +363,11 @@ function filterJudge(url, data) {
 
 function getCodes() {
   fetch('../config/nyyl.json')
-  .then(response => response.json())
-  .then(data => {
-    judge_codes = data.judge_codes;
-  })
-  .catch(error => console.error('Error loading config:', error));
+    .then(response => response.json())
+    .then(data => {
+      judge_codes = data.judge_codes;
+    })
+    .catch(error => console.error('Error loading config:', error));
 }
 
 // api call to get other instances of freestyle scored

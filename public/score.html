@@ -1,0 +1,42 @@
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Scales Clicker </title>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load("current", { packages: ["corechart", "line"] });
+  </script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="clicker.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="new-style.css" />
+</head>
+
+<div class="container mt-4">
+  <div id="judge-select" class="text-center mb-4">
+      <select id="judge-pick" class="form-select d-inline-block w-auto">
+      </select>
+  </div>
+  <div id="scoring" class="text-center mb-4">
+      <div id="click-display" class="d-flex justify-content-center">
+          <h2 id="positive-display" class="mx-3">+0</h2>
+          <h2 id="negative-display" class="mx-3">-0</h2>
+      </div>
+      <div id="replay" class="row g-3">
+          <div class="col-md-6 d-flex justify-content-center">
+              <div id="video" class="w-100">
+              </div>
+          </div>
+          <div class="col-md-6 d-flex justify-content-center">
+              <div id="chart" class="w-100">
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+</html>
