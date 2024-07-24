@@ -179,12 +179,12 @@ function closeIntro() {
 
 // popup for flash option
 function openFlash() {
-  $("#flash-prompt").show();
+  $("#flashPromptModal").modal('show');
 }
 
 // close popup for flash option
 function closeFlash(response) {
-  $("#flash-prompt").hide();
+  $("#flashPromptModal").modal('hide');
   if (response) {
     isFlash = true;
   } else {
@@ -244,7 +244,7 @@ function openScoring() {
 function closeInputs() {
   isFlash = $("#flash-border-toggle").prop("checked");
   judgeName = $("#judge-name").val();
-  $("#inputsModal").modal('show');
+  $("#inputsModal").modal('hide');
   openScoring();
   if (isReplayMode) {
     importScores();

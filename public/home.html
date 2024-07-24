@@ -21,8 +21,8 @@
         <a href="home.html" class="text-decoration-none">
             <h1 class="mb-0 text-white">Scales Clicker</h1>
         </a>
-        <svg onclick="openInputs()" xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi bi-gear text-white"
-            viewBox="0 0 16 16">
+        <svg onclick="openInputs()" xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor"
+            class="bi bi-gear text-white" viewBox="0 0 16 16">
             <path
                 d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
             <path
@@ -33,6 +33,9 @@
         <div class="col-6 text-center">
             <h1 class="mb-0 text-white">Scales Clicker</h1>
             <h3 class="mb-0 text-white">an analytical yo-yo freestyle scoring tool</h3>
+            <a href="https://www.instagram.com/colinbeckford" class="text-decoration-none">
+                <h5 class="mb-0 text-white">by colin beckford</h5>
+            </a>
             <div class="row mt-2 justify-content-center">
                 <div class="col-auto">
                     <label for="initial-yt-link" class="form-label text-white">Freestyle Link</label>
@@ -93,8 +96,27 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="closeInputs()">Save</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-light" onclick="closeInputs()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="flashPromptModal" tabindex="-1" aria-labelledby="flashPromptModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content  dark-teal text-white">
+                <div class="modal-header">
+                    <div class="w-100 text-center">
+                        <h5 class="modal-title" id="flashPromptModalLabel">Flash Video Border</h5>
+                    </div>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Flash video border during clicks?</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" onclick="closeFlash(true)">Yes</button>
+                    <button type="button" class="btn btn-danger" onclick="closeFlash(false)">No</button>
                 </div>
             </div>
         </div>
