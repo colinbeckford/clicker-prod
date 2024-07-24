@@ -347,7 +347,7 @@ function filterJudge(url, data) {
 }
 
 function getCodes() {
-  fetch('../config/config.json')
+  fetch('../config/nyyl.json')
   .then(response => response.json())
   .then(data => {
     judge_codes = data.judge_codes;
