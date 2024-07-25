@@ -4,10 +4,6 @@ html, body {
     overflow: hidden;
   }
 
-replay {
-    width: max-content;
-}
-
 .dark-teal {
     background-color: #062229;
 }

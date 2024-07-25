@@ -51,6 +51,9 @@ var data;
 
 var judge_codes;
 
+var pageWidth;
+var pageHeight;
+
 // css functions to hide components, assigning keys
 $(document).ready(function () {
   getCodes();
@@ -58,7 +61,6 @@ $(document).ready(function () {
   getFreestyles();
   // gets url of location
   let myurl = new URL(window.location.href);
-  // code for adjusting keybinds
   $("#positive-key").on("keydown", function (pos_e) {
     positiveKey = pos_e.keyCode;
   });
@@ -76,11 +78,12 @@ $(document).ready(function () {
     $(this).focus();
     event.preventDefault();
   });
-
+  pageWidth = $(window).width();
+  pageHeight = $(window).height();
   window.onerror = function (message, source, lineno, colno, error) {
-    console.error('Error message:', message);
+    console.error("Error message:", message);
     alert("There has been an error with this application, please refresh.");
-  }
+  };
 });
 
 function handleSelectChange() {
@@ -173,28 +176,28 @@ function closeIntro() {
 
 // popup for flash option
 function openFlash() {
-  $("#flashPromptModal").modal('show');
+  $("#flashPromptModal").modal("show");
 }
 
 function fetchPage() {
-  fetch('score.html')
-    .then(response => {
+  fetch("score.html")
+    .then((response) => {
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       return response.text();
     })
-    .then(data => {
-      document.getElementById('main').innerHTML = data;
+    .then((data) => {
+      document.getElementById("main").innerHTML = data;
     })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
     });
 }
 
 // close popup for flash option
 function closeFlash(response) {
-  $("#flashPromptModal").modal('hide');
+  $("#flashPromptModal").modal("hide");
   fetchPage();
   if (response) {
     isFlash = true;
@@ -243,16 +246,14 @@ function closeSelect() {
 
 // opens the inputs for judge name and keybinds
 function openInputs() {
-  $("#inputsModal").modal('show');
+  $("#inputsModal").modal("show");
 }
 
 // closes the inputs for judge name and keybinds
 function closeInputs() {
   isFlash = $("#flash-border-toggle").prop("checked");
-  console.log("Is Flash", isFlash);
-  console.log("Is Replay Mode", isReplayMode);
   judgeName = $("#judge-name").val();
-  $("#inputsModal").modal('hide');
+  $("#inputsModal").modal("hide");
   fetchPage();
   if (isReplayMode) {
     importScores();
@@ -335,7 +336,7 @@ function chopLink(link) {
 
 function filterJudge(url, data) {
   const urlParams = new URLSearchParams(new URL(url).search);
-  const code = urlParams.get('nyyl');
+  const code = urlParams.get("nyyl");
   var filteredJudge;
   for (let judge of judge_codes) {
     if (judge.judgeCode == code) {
@@ -345,7 +346,7 @@ function filterJudge(url, data) {
   let judgeCount = 1;
   let replacedJudges = {};
 
-  data.forEach(entry => {
+  data.forEach((entry) => {
     if (entry.judge !== filteredJudge && !replacedJudges[entry.judge]) {
       replacedJudges[entry.judge] = `Judge ${judgeCount++}`;
     }
@@ -356,12 +357,12 @@ function filterJudge(url, data) {
 }
 
 function getCodes() {
-  fetch('../config/nyyl.json')
-    .then(response => response.json())
-    .then(data => {
+  fetch("../config/nyyl.json")
+    .then((response) => response.json())
+    .then((data) => {
       judge_codes = data.judge_codes;
     })
-    .catch(error => console.error('Error loading config:', error));
+    .catch((error) => console.error("Error loading config:", error));
 }
 
 // api call to get other instances of freestyle scored
@@ -382,8 +383,7 @@ function getScores(link) {
         console.error("Error fetching data:", error);
         throw error;
       });
-  }
-  else {
+  } else {
     return fetch(`/getClicks/${link}`)
       .then((response) => {
         if (!response.ok) {
@@ -399,7 +399,6 @@ function getScores(link) {
         throw error;
       });
   }
-
 }
 
 function getJudges() {
@@ -418,8 +417,7 @@ function getJudges() {
         console.error("Error fetching data:", error);
         throw error;
       });
-  }
-  else {
+  } else {
     return fetch(`/getJudges`)
       .then((response) => {
         if (!response.ok) {
@@ -437,7 +435,6 @@ function getJudges() {
   }
 }
 
-
 function getFreestyles() {
   if (window.location.href.includes("nyyl")) {
     return fetch(`/getLinks_NYYL`)
@@ -454,8 +451,7 @@ function getFreestyles() {
         console.error("Error fetching data:", error);
         throw error;
       });
-  }
-  else {
+  } else {
     return fetch(`/getLinks`)
       .then((response) => {
         if (!response.ok) {
@@ -471,7 +467,6 @@ function getFreestyles() {
         throw error;
       });
   }
-
 }
 
 function appendClicks() {
@@ -484,7 +479,7 @@ function appendClicks() {
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
+        throw new Error("Network response was not ok " + response.statusText);
       }
       return response.json();
     })
@@ -494,7 +489,9 @@ function appendClicks() {
       return data;
     })
     .catch((error) => {
-      alert("There has been an error with saving the score for this routine. Please refresh and try again.");
+      alert(
+        "There has been an error with saving the score for this routine. Please refresh and try again."
+      );
       console.error("Error:", error);
     });
 }
@@ -618,13 +615,13 @@ function drawChart(scores) {
           var deltaValue = symbol + delta;
           newRow.push(
             "<div>" +
-            resultArray[0][i * 2 - 1] +
-            "</div>" +
-            "<div>" +
-            deltaValue +
-            " " +
-            convertIntegerToTime(subArray[0]) +
-            "</div>"
+              resultArray[0][i * 2 - 1] +
+              "</div>" +
+              "<div>" +
+              deltaValue +
+              " " +
+              convertIntegerToTime(subArray[0]) +
+              "</div>"
           );
         }
       }
@@ -684,8 +681,8 @@ function drawChart(scores) {
       gridlines: { count: 5 },
     },
     tooltip: { isHtml: true, trigger: "selection", enabled: true },
-    width: 560,
-    height: 315
+    width: pageWidth/2.2,
+    height: pageHeight/2,
   };
 
   chart = new google.visualization.LineChart(document.getElementById("chart"));
@@ -767,13 +764,16 @@ function loadVideo() {
   }
 }
 
-
 function setViewingMode(type) {
   $("#replay").css("display", "flex");
   if (type == true) {
+    $("#scoring").prepend(`<div id="judge-select" class="text-center mb-2">
+      <select id="judge-pick" class="form-select d-inline-block w-auto">
+      </select>
+  </div>`);
     $("#replay").append(`
       <div class="col-md-6 d-flex justify-content-center">
-          <div id="chart" class="w-100"></div>
+          <div id="chart" class="w-auto"></div>
       </div>
   `);
   } else {
@@ -783,7 +783,7 @@ function setViewingMode(type) {
 
 // pauses video onload and retrieves index of selected judge
 function onPlayerReady(event) {
-  $('#focusable').focus();
+  $("#focusable").focus();
   event.target.pauseVideo();
   if (isReplayMode) {
     checkInterval = setInterval(seekIndicator, 1000);
@@ -805,7 +805,7 @@ function onPlayerStateChange(event) {
   //   seekMarker = player.getCurrentTime();
   //   isPaused = false;
   //   replayTimer();
-  // } 
+  // }
   else if (event.data == YT.PlayerState.PAUSED) {
     handleFocus(false);
     // $(document).off("keydown", handleKeydown);
@@ -822,8 +822,8 @@ function onYouTubeIframeAPIReady() {
   if (isReplayMode == false || JSON.stringify(importData) !== "{}") {
     if (isReplayMode) {
       player = new YT.Player("player", {
-        width: 560,
-        height: 315,
+        width: pageWidth/2.2,
+        height: pageHeight/2,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
@@ -835,8 +835,8 @@ function onYouTubeIframeAPIReady() {
       $("#video-frame").removeClass("col-md-6");
       //remove chart code? check for this
       player = new YT.Player("player", {
-        width: 800,
-        height: 450,
+        width: pageWidth/1.2,
+        height: pageHeight/1.2,
         videoId: youtubeLink,
         events: {
           onReady: onPlayerReady,
@@ -888,15 +888,13 @@ function onPlayerStateChange(event) {
     // need to reimplement this for key inputs interacting with video
     handleFocus(true);
     // $(document).on("keydown", handleKeydown);
-  }
-  else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
+  } else if (event.data == YT.PlayerState.PLAYING && isReplayMode) {
     wasPaused = false;
     selectJudge();
     seekMarker = player.getCurrentTime();
     isPaused = false;
     replayTimer();
-  }
-  else if (event.data == YT.PlayerState.PAUSED) {
+  } else if (event.data == YT.PlayerState.PAUSED) {
     handleFocus(false);
     // $(document).off("keydown", handleKeydown);
     wasPaused = true;
@@ -909,10 +907,9 @@ function onPlayerStateChange(event) {
 
 function handleFocus(focus) {
   if (focus == true) {
-    $('#focusable').focus();
-  }
-  else {
-    $('#focusable').blur();
+    $("#focusable").focus();
+  } else {
+    $("#focusable").blur();
   }
 }
 
